@@ -1698,7 +1698,6 @@ void setup() {
     LoadLum();
     LoadDebug();
     LoadUdpDelay();
-    sleep(5);
 #ifdef ZEDMD_HD_HALF
     LoadYOffset();
 #endif
@@ -1709,6 +1708,7 @@ void setup() {
 #elif defined(DISPLAY_LED_MATRIX)
   display = new LedMatrix();  // For LED matrix display
 #endif
+  sleep(1);
   display->SetBrightness(brightness);
 
   if (!fileSystemOK) {
