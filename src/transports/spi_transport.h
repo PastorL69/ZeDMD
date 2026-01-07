@@ -13,7 +13,7 @@
 #include "main.h"
 #include "transport.h"
 
-#define SPI_TRANSPORT_ENABLE_PIN 13
+#define SPI_TRANSPORT_ENABLE_PIN 22
 #define SPI_TRANSPORT_CLK_PIN 14
 #define SPI_TRANSPORT_DATA_PIN 15
 
