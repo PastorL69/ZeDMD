@@ -141,7 +141,7 @@ uint8_t panelI2sspeed = 8;
 uint8_t panelLatchBlanking = 2;
 uint8_t panelMinRefreshRate = 60;
 #ifdef ZEDMD_DEX16
-int8_t yOffset = 8;
+yOffset = 8;
 #endif
 #ifdef DMDREADER
 bool core_0_initialized = false;
