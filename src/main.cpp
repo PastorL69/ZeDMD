@@ -130,11 +130,16 @@ bool rgb565ZoneStream = false;
 // see something.
 #ifdef DISPLAY_RM67162_AMOLED
 uint8_t brightness = 5;
+#elif defined(ZEDMD_DEX16)
+uint8_t brightness = 2;
+uint8_t rgbMode = 0;  // Valid values are 0-5.
+uint8_t rgbModeLoaded = 0;
+int8_t yOffset = 8;
 #else
 uint8_t brightness = 2;
 uint8_t rgbMode = 0;  // Valid values are 0-5.
 uint8_t rgbModeLoaded = 0;
-int8_t yOffset = 16;
+int8_t yOffset = 0;
 uint8_t panelClkphase = 0;
 uint8_t panelDriver = 0;
 uint8_t panelI2sspeed = 8;
