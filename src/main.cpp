@@ -930,6 +930,8 @@ void DisplayLogo() {
     f = LittleFS.open("/logoHD.raw", "r");
   } else if (TOTAL_WIDTH == 192 && TOTAL_HEIGHT == 64) {
     f = LittleFS.open("/logoSEGAHD.raw", "r");
+  } else if (TOTAL_WIDTH == 128 && TOTAL_HEIGHT == 16) {
+    f = LittleFS.open("/logoDEX16.raw", "r");
   } else {
     f = LittleFS.open("/logo.raw", "r");
   }
@@ -985,6 +987,8 @@ void DisplayUpdate() {
   if (TOTAL_WIDTH == 256 && TOTAL_HEIGHT == 64) {
     f = LittleFS.open("/ppucHD.raw", "r");
   } else if (TOTAL_WIDTH == 192 && TOTAL_HEIGHT == 64) {
+    // need to add some day
+  } else if (TOTAL_WIDTH == 128 && TOTAL_HEIGHT == 16) {
     // need to add some day
   } else {
     f = LittleFS.open("/ppuc.raw", "r");
