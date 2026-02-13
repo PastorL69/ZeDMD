@@ -308,11 +308,11 @@ void DisplayVersion(bool logo = false) {
   snprintf(version, 9, "%d.%d.%d", ZEDMD_VERSION_MAJOR, ZEDMD_VERSION_MINOR,
            ZEDMD_VERSION_PATCH);
   #ifdef DMDREADER
-  display->DisplayText(version, TOTAL_WIDTH - (strlen(version) * 4),
+  display->DisplayText(version, TOTAL_WIDTH - (strlen(version) * 3),
                        TOTAL_HEIGHT - 5, 255 * !logo, 255 * !logo, 255 * !logo,
                        logo);
   #else
-  display->DisplayText(version, TOTAL_WIDTH - (strlen(version) * 4) - 5,
+  display->DisplayText(version, TOTAL_WIDTH - (strlen(version) * 3) - 5,
                        TOTAL_HEIGHT - 5, 255 * !logo, 255 * !logo, 255 * !logo,
                        logo);
   #endif
