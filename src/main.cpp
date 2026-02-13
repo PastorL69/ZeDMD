@@ -126,13 +126,13 @@ uint8_t lastBuffer __attribute__((aligned(4)));
 uint8_t processingBuffer __attribute__((aligned(4)));
 bool rgb565ZoneStream = false;
 
-// Init display on a low brightness to avoid power issues, but bright enough to
-// see something.
 #ifdef ZEDMD_DEX16
 int8_t yOffset = 8;
 #else
 int8_t yOffset = 0;
 #endif
+// Init display on a low brightness to avoid power issues, but bright enough to
+// see something.
 #ifdef DISPLAY_RM67162_AMOLED
 uint8_t brightness = 5;
 #else
