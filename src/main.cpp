@@ -2721,7 +2721,7 @@ void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
   static uint32_t lastDmdReaderInitAttempt = 0;
 
-  if (!spiTransport->isDmdReaderInitialized() && transport->isLoopback()) {
+  if (!spiTransport->isDmdReaderInitialized()) {
     spiTransport->initDmdReader();
     // Blink to indicate that loopback mode is active but DMD reader is not yet
     // initialized.
@@ -2732,7 +2732,7 @@ void loop1() {
     return;
   }
 
-  if (!transport->isLoopback()) {
+  if (!transport->isLoopback() && spiTransport->isDmdReaderInitialized()) {
     dmdreader_spi_send();
     tight_loop_contents();
   } else {
