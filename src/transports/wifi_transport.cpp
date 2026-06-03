@@ -234,7 +234,7 @@ void WifiTransport::HandleTcpDisconnect(void* arg, AsyncClient* client) {
 
 void WifiTransport::NewTcpClient(void* arg, AsyncClient* client) {
   if (transportActive) {
-    client->stop();
+    client->close();
     delete client;
     return;
   }
@@ -470,7 +470,13 @@ void WifiTransport::startServer() {
 #else
             "0"  // ESP32
 #endif
-                      + "|" + String(panelLineDecoder));
+                      + "|"
+#ifndef DISPLAY_RM67162_AMOLED
+                      String(panelLineDecoder)
+#else
+            "0"
+#endif
+                      );
   });
 
   server->on("/ppuc.png", HTTP_GET, [](AsyncWebServerRequest* request) {

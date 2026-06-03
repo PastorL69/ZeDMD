@@ -791,7 +791,14 @@ void AcquireNextBuffer() {
 
 void CheckMenuButton() {
 #ifndef DISPLAY_RM67162_AMOLED
+
+#ifdef BACKWARD_BUTTON_PIN
+  if (!digitalRead(FORWARD_BUTTON_PIN) || 
+      !digitalRead(BACKWARD_BUTTON_PIN)) {
+#else
   if (!digitalRead(FORWARD_BUTTON_PIN)) {
+#endif
+
     ClearScreen();
     settingsMenu = true;
     SaveSettingsMenu();
@@ -1271,8 +1278,9 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
 #else
             response[N_INTERMEDIATE_CTR_CHARS + 21] = 0;  // ESP32
 #endif
+#ifndef DISPLAY_RM67162_AMOLED
             response[N_INTERMEDIATE_CTR_CHARS + 22] = panelLineDecoder;
-
+#endif
             response[63 - N_ACK_CHARS] = 'R';
             Serial.write(response, 64 - N_ACK_CHARS);
             // This flush is required for USB CDC on Windows.
@@ -2066,23 +2074,23 @@ void setup() {
 
     const auto forwardButton = new Bounce2::Button();
     forwardButton->attach(FORWARD_BUTTON_PIN, INPUT_PULLUP);
-    forwardButton->interval(100);
+    forwardButton->interval(DEBOUNCE_INTERVAL);
     forwardButton->setPressedState(LOW);
 
     const auto upButton = new Bounce2::Button();
     upButton->attach(UP_BUTTON_PIN, INPUT_PULLUP);
-    upButton->interval(100);
+    upButton->interval(DEBOUNCE_INTERVAL);
     upButton->setPressedState(LOW);
 
 #if defined(ARDUINO_ESP32_S3_N16R8) || defined(PICO_BUILD)
     const auto backwardButton = new Bounce2::Button();
     backwardButton->attach(BACKWARD_BUTTON_PIN, INPUT_PULLUP);
-    backwardButton->interval(100);
+    backwardButton->interval(DEBOUNCE_INTERVAL);
     backwardButton->setPressedState(LOW);
 
     const auto downButton = new Bounce2::Button();
     downButton->attach(DOWN_BUTTON_PIN, INPUT_PULLUP);
-    downButton->interval(100);
+    downButton->interval(DEBOUNCE_INTERVAL);
     downButton->setPressedState(LOW);
 #endif
 
@@ -2115,7 +2123,7 @@ void setup() {
 #ifdef DMDREADER
         if (position == 5 || position == 6) position = forward ? 7 : 4;
 #elif defined(PICO_BUILD)
-        if (position == 5) position = forward ? 6 : 4;
+        if (position == 5 || position == 3) position = forward ? 6 : 2;
 #endif
 
         switch (position) {
