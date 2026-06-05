@@ -63,6 +63,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio rich_click intelhex
 
+      - name: Configure Git authentication
+        run: |
+          git config --global url."https://${{ secrets.PRIVATE_KEY }}@github.com/".insteadOf \
+            "https://github.com/"
+
       - name: Build firmware
         run: |
           pio run -e ${{ matrix.panels }}
