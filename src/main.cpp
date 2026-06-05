@@ -1065,7 +1065,7 @@ void DisplayFrame() {
           f.read();
       renderBuffer[currentRenderBuffer][tj + rgbOrder[rgbMode * 3 + 2]] =
           f.read();
-    
+    }
   }
 #else
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj++) {
