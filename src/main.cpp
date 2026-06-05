@@ -1073,7 +1073,6 @@ void DisplayFrame() {
   }
 #endif
   f.close();
-  firstRgbModeLoad = false;
 
   Render(false);
   DisplayVersion(true);
