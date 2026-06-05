@@ -2720,7 +2720,6 @@ void setup1() {
 
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
-  static uint32_t lastDmdReaderInitAttempt = 0;
 
   if (!spiTransport->isDmdReaderInitialized()) {
     spiTransport->initDmdReader();
