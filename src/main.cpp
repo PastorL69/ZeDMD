@@ -1056,6 +1056,7 @@ void DisplayFrame() {
     renderBuffer[currentRenderBuffer][tj] = f.read();
     renderBuffer[currentRenderBuffer][tj + 1] = f.read();
     renderBuffer[currentRenderBuffer][tj + 2] = f.read();
+  }
 #else
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj++) {
     renderBuffer[currentRenderBuffer][tj] = f.read();
