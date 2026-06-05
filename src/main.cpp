@@ -2312,11 +2312,12 @@ void setup() {
             break;
           }
           case 7: {  // RGB order
-            if (rgbModeLoaded != 0) {
+            if (firstRgbModeLoad) {
+              firstRgbModeLoad = false;
               rgbMode = 0;
-              SaveRgbOrder();
-              delay(10);
-              Restart();
+              RefreshSetupScreen();
+              DisplayRGB(255, 191, 0);
+              break;
             }
             if (up && ++rgbMode > 5)
               rgbMode = 0;
@@ -2324,7 +2325,6 @@ void setup() {
                      --rgbMode >
                          5)  // underflow will result in 255, set it to 5
               rgbMode = 5;
-            firstRgbModeLoad = false;
             RefreshSetupScreen();
             DisplayRGB(255, 191, 0);
             break;
