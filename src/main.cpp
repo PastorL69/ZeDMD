@@ -2228,10 +2228,10 @@ void setup() {
             break;
           }
           case 2: {  // Brightness
-            if (up && ++brightness > 15)
+            if (up && ++brightness > MAX_BRIGHTNESS)
               brightness = 1;
             else if (down && --brightness < 1)
-              brightness = 15;
+              brightness = MAX_BRIGHTNESS;
 
             display->SetBrightness(brightness);
             DisplayLum(255, 191, 0);
