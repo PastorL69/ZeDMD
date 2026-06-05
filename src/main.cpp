@@ -132,7 +132,7 @@ bool rgb565ZoneStream = false;
 uint8_t brightness = 5;
 #else
 uint8_t brightness = 2;
-uint8_t rgbMode = 0;  // Valid values are 0-5.
+uint8_t rgbMode = DEFAULT_RGB_MODE;  // Valid values are 0-5.
 uint8_t rgbModeLoaded = 0;
 uint8_t panelClkphase = 0;
 uint8_t panelDriver = 0;
