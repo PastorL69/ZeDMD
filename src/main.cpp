@@ -2312,7 +2312,6 @@ void setup() {
           }
           case 7: {  // RGB order
             if (rgbModeLoaded != 0 || rgbModeLoaded == 6) {
-              firstMenuRendering = false;
               rgbMode = 0;
               SaveRgbOrder();
               delay(10);
