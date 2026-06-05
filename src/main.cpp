@@ -132,7 +132,6 @@ bool rgb565ZoneStream = false;
 uint8_t brightness = 5;
 #else
 uint8_t brightness = 2;
-bool firstRgbModeLoad = false;
 uint8_t rgbMode = DEFAULT_RGB_MODE;  // Valid values are 0-5.
 uint8_t rgbModeLoaded = 0;
 uint8_t panelClkphase = 0;
@@ -480,7 +479,7 @@ void LoadRgbOrder() {
   File f = LittleFS.open("/rgb_order.val", "r");
   if (!f) {
     SaveRgbOrder();
-    firstRgbModeLoad = true;
+    rgbModeLoaded = 6;
     return;
   }
   rgbMode = rgbModeLoaded = f.read();
@@ -1055,7 +1054,7 @@ void DisplayFrame() {
   }
 #ifndef DISPLAY_RM67162_AMOLED
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj += 3) {
-    if ((rgbMode == rgbModeLoaded) || firstRgbModeLoad) {
+    if ((rgbMode == rgbModeLoaded) || rgbModeLoaded == 6) {
       renderBuffer[currentRenderBuffer][tj] = f.read();
       renderBuffer[currentRenderBuffer][tj + 1] = f.read();
       renderBuffer[currentRenderBuffer][tj + 2] = f.read();
@@ -2312,8 +2311,8 @@ void setup() {
             break;
           }
           case 7: {  // RGB order
-            if (rgbModeLoaded != 0 || firstRgbModeLoad) {
-              firstRgbModeLoad = false;
+            if (rgbModeLoaded != 0 || rgbModeLoaded == 6) {
+              firstMenuRendering = false;
               rgbMode = 0;
               SaveRgbOrder();
               delay(10);
