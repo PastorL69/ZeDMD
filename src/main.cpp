@@ -2325,6 +2325,7 @@ void setup() {
                      --rgbMode >
                          5)  // underflow will result in 255, set it to 5
               rgbMode = 5;
+            firstRgbModeLoad = false;
             RefreshSetupScreen();
             DisplayRGB(255, 191, 0);
             break;
