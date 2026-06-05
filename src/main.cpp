@@ -2312,12 +2312,12 @@ void setup() {
             break;
           }
           case 7: {  // RGB order
-            if (firstRgbModeLoad) {
+            if (rgbModeLoaded != 0 || firstRgbModeLoad) {
               firstRgbModeLoad = false;
               rgbMode = 0;
-              RefreshSetupScreen();
-              DisplayRGB(255, 191, 0);
-              break;
+              SaveRgbOrder();
+              delay(10);
+              Restart();
             }
             if (up && ++rgbMode > 5)
               rgbMode = 0;
