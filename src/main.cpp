@@ -1053,17 +1053,11 @@ void DisplayFrame() {
   }
 #ifndef DISPLAY_RM67162_AMOLED
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj += 3) {
-    if (rgbMode == rgbModeLoaded) {
-      renderBuffer[currentRenderBuffer][tj] = f.read();
-      renderBuffer[currentRenderBuffer][tj + 1] = f.read();
-      renderBuffer[currentRenderBuffer][tj + 2] = f.read();
-    } else {
       renderBuffer[currentRenderBuffer][tj + rgbOrder[rgbMode * 3]] = f.read();
       renderBuffer[currentRenderBuffer][tj + rgbOrder[rgbMode * 3 + 1]] =
           f.read();
       renderBuffer[currentRenderBuffer][tj + rgbOrder[rgbMode * 3 + 2]] =
           f.read();
-    }
   }
 #else
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj++) {
