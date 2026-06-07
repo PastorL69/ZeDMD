@@ -470,7 +470,7 @@ void WifiTransport::startServer() {
 #else
             "0"  // ESP32
 #endif
-                      + "|"
+                      + "|" +
 #ifndef DISPLAY_RM67162_AMOLED
                       String(panelLineDecoder)
 #else
