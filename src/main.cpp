@@ -999,7 +999,7 @@ void DisplayLogo() {
   }
 #ifndef DISPLAY_RM67162_AMOLED
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj += 3) {
-    if (rgbMode == rgbModeLoaded) {
+    if ((rgbMode == rgbModeLoaded) || (rgbModeLoaded == 6)) {
       renderBuffer[currentRenderBuffer][tj] = f.read();
       renderBuffer[currentRenderBuffer][tj + 1] = f.read();
       renderBuffer[currentRenderBuffer][tj + 2] = f.read();
@@ -1054,7 +1054,7 @@ void DisplayFrame() {
   }
 #ifndef DISPLAY_RM67162_AMOLED
   for (uint16_t tj = 0; tj < TOTAL_BYTES; tj += 3) {
-    if ((rgbMode == rgbModeLoaded) || rgbModeLoaded == 6) {
+    if ((rgbMode == rgbModeLoaded) || (rgbModeLoaded == 6)) {
       renderBuffer[currentRenderBuffer][tj] = f.read();
       renderBuffer[currentRenderBuffer][tj + 1] = f.read();
       renderBuffer[currentRenderBuffer][tj + 2] = f.read();
