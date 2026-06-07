@@ -70,12 +70,14 @@ jobs:
           pio run -e ${{ matrix.panels }} -t buildunified
           cp .pio/build/${{ matrix.panels }}/firmware.uf2 firmware-update.uf2
           cp .pio/build/${{ matrix.panels }}/firmware_with_fs.uf2 firmware.uf2
+          cp .pio/build/${{ matrix.panels }}/firmware.elf firmware.elf
 
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.panels }}
           path: |
             firmware.uf2
+            firmware.elf
             firmware-update.uf2
 
   post-build:
@@ -89,37 +91,37 @@ jobs:
         run: |
             cd ../pico2_128x32_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../pico2_256x64_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_256x64_ppucdmdzip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../pico2_256x64_ppucdmdzip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../pico2_128x64x2_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_128x16
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_128x16.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_128x32
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_128x32.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_192x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_192x64.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_256x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_256x64.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_128x64x2
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_128x32_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32_speakerlights.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_128x32_speakerlights.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_256x64_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64_speakerlights.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_256x64_speakerlights.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ../ppucdmd_128x64x2_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2_speakerlights.zip firmware.uf2 firmware-update.uf2 version.txt
+            zip ../ppucdmd_128x64x2_speakerlights.zip firmware.uf2 firmware.elf firmware-update.uf2 version.txt
             cd ..
       - name: Release
         uses: softprops/action-gh-release@v3
