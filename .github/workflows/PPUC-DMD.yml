@@ -69,7 +69,9 @@ jobs:
           
           BUILD_DIR=.pio/build/${{ matrix.panels }}
           OFFSET_BIN=$(( $(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
-
+          echo "Decimal: $OFFSET_BIN"
+          printf "Hex: 0x%X\n" "$OFFSET_BIN"
+          
           # Create combined flash image
           cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
           truncate -s $OFFSET_BIN $BUILD_DIR/firmware_with_fs.bin
