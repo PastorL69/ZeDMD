@@ -98,37 +98,37 @@ jobs:
         run: |
             cd ../pico2_128x32_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../pico2_256x64_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../pico2_128x64x2_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_128x16
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_128x32
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_192x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_256x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_128x64x2
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_128x32_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_128x32_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_256x64_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_256x64_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ../ppucdmd_128x64x2_speakerlights
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware-fs.bin firmware.bin firmware_with_fs.bin version.txt
+            zip ../ppucdmd_128x64x2_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             
             cd ..
       - name: Release
