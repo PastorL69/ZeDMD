@@ -65,14 +65,12 @@ jobs:
         run: |
           pio run -e ${{ matrix.panels }}
           pio run -e ${{ matrix.panels }} -t buildfs
-          pio run -e ${{ matrix.panels }} -t buildunified
+          pio run -e ${{ matrix.panels }} -t buildunified > build.log 2>&1
           
           BUILD_DIR=.pio/build/${{ matrix.panels }}
-          OFFSET_BIN=$(( $(grep -oE '--offset 0x[0-9a-fA-F]+' | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
-          echo "Decimal:"
-          echo "$OFFSET_BIN"
-          echo "Hex:"
-          printf "0x%X\n" "$OFFSET_BIN"
+          OFFSET_BIN=$(( $(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
+          echo "Decimal: $OFFSET_BIN"
+          printf "Hex: 0x%X\n" "$OFFSET_BIN"
 
           # Create combined flash image
           cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
