@@ -66,18 +66,19 @@ jobs:
           pio run -e ${{ matrix.panels }}
           pio run -e ${{ matrix.panels }} -t buildfs
           pio run -e ${{ matrix.panels }} -t buildunified
+          
           BUILD_DIR=.pio/build/${{ matrix.panels }}
+          OFFSET_BIN=$(( $(sed -n 's/.*--offset \([^ ]*\).*/\1/p') - 0x10000000 ))
 
           # Create combined flash image
           cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
-          truncate -s $((0x1BF000)) $BUILD_DIR/firmware_with_fs.bin
+          truncate -s $OFFSET_BIN $BUILD_DIR/firmware_with_fs.bin
           cat $BUILD_DIR/littlefs.bin >> $BUILD_DIR/firmware_with_fs.bin
 
-          cp .pio/build/${{ matrix.panels }}/firmware_with_fs.uf2 firmware.uf2
-          cp .pio/build/${{ matrix.panels }}/firmware.uf2 firmware-update.uf2
-          cp .pio/build/${{ matrix.panels }}/littlefs.bin firmware-fs.bin
-          cp .pio/build/${{ matrix.panels }}/firmware.bin firmware.bin
-          cp .pio/build/${{ matrix.panels }}/firmware_with_fs.bin firmware_with_fs.bin
+          cp $BUILD_DIR/firmware_with_fs.uf2 firmware.uf2
+          cp $BUILD_DIR/firmware.uf2 firmware-update.uf2
+          cp $BUILD_DIR/firmware_with_fs.bin firmware.bin
+          cp $BUILD_DIR/firmware.bin firmware-update.bin
 
       - uses: actions/upload-artifact@v7
         with:
@@ -85,9 +86,8 @@ jobs:
           path: |
             firmware.uf2
             firmware-update.uf2
-            firmware-fs.bin
             firmware.bin
-            firmware_with_fs.bin
+            firmware-update.bin
 
   post-build:
     runs-on: ubuntu-latest
