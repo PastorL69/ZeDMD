@@ -65,7 +65,6 @@ jobs:
         run: |
           pio run -e ${{ matrix.panels }}
           pio run -e ${{ matrix.panels }} -t buildfs
-          python3 -c "fw = open('.pio/build/${{ matrix.panels }}/firmware.bin', 'rb').read(); fs = open('.pio/build/${{ matrix.panels }}/littlefs.bin', 'rb').read(); open('.pio/build/${{ matrix.panels }}/firmware_with_fs.bin', 'wb').write(fw.ljust(0x1bf000, b'\xFF') + fs)"
           pio run -e ${{ matrix.panels }} -t buildunified
           cp .pio/build/${{ matrix.panels }}/firmware_with_fs.uf2 firmware.uf2
           cp .pio/build/${{ matrix.panels }}/firmware.uf2 firmware-update.uf2
