@@ -1,6 +1,5 @@
 from pathlib import Path
 import shutil
-import os
 
 Import("env")
 
@@ -51,34 +50,3 @@ if missing_files:
 
 env.Replace(PROJECT_DATA_DIR=str(staged_data_dir))
 print(f"Filesystem data staged in {staged_data_dir}: {', '.join(allowed_files)}")
-
-def merge_binaries(source, target, map, **kwargs):
-    build_dir = env.subst("$BUILD_DIR")
-    
-    firmware_elf = os.path.join(build_dir, "firmware.elf")
-    firmware_bin = os.path.join(build_dir, "firmware.bin")
-    littlefs_bin = os.path.join(build_dir, "littlefs.bin")
-    combined_bin = os.path.join(build_dir, "firmware_with_fs.bin")
-    
-    # 1. Use PlatformIO's internal toolchain to convert ELF -> BIN on the fly
-    env.Execute(f'"{env.subst("$OBJCOPY")}" -O binary "{firmware_elf}" "{firmware_bin}"')
-
-    if not os.path.exists(firmware_bin) or not os.path.exists(littlefs_bin):
-        print("--> Error: Required binaries for merging are missing.")
-        return
-
-    print(f"--> Generating combined BIN: {combined_bin}")
-    fs_offset = 0x1bf000 
-    
-    with open(firmware_bin, "rb") as f_fw:
-        fw_data = f_fw.read()
-    with open(littlefs_bin, "rb") as f_fs:
-        fs_data = f_fs.read()
-        
-    padded_fw = fw_data.ljust(fs_offset, b'\xFF')
-    with open(combined_bin, "wb") as f_out:
-        f_out.write(padded_fw + fs_data)
-        
-    print("--> Success: Combined monolithic BIN successfully created!")
-
-env.AddPostAction(os.path.join(env.subst("$BUILD_DIR"), "littlefs.bin"), merge_binaries)
