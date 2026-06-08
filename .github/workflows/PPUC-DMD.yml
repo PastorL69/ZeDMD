@@ -68,7 +68,7 @@ jobs:
           pio run -e ${{ matrix.panels }} -t buildunified
           
           BUILD_DIR=.pio/build/${{ matrix.panels }}
-          OFFSET_BIN=$(( $(sed -n 's/.*--offset \([^ ]*\).*/\1/p') - 0x10000000 ))
+          OFFSET_BIN=$(( $(grep -oE '--offset 0x[0-9a-fA-F]+' | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
           echo "Decimal:"
           echo "$OFFSET_BIN"
           echo "Hex:"
