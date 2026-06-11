@@ -1148,6 +1148,9 @@ void RefreshSetupScreen() {
 #endif
   display->DisplayText("Exit", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
                        (MENU_HEIGHT / 2) + 4, 128, 128, 128);
+  DisplayNumber(clock_get_hz(clk_sys), 3,
+                TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
+                (MENU_HEIGHT / 2) + 9, 128, 128, 128);
 }
 
 uint8_t HandleData(uint8_t *pData, size_t len) {
