@@ -15,7 +15,7 @@
 
 #define LEFT_SPEAKER_PIN 21
 #define RGBW false
-#define NUM_PIXELS 16
+#define NUM_PIXELS 50
 #define FREQ 800000 // 800khz speed
 #define BRIGHTNESS 15 // 0-255, 25 is already really bright
 #define MAX_CYCLES 1000 // 10 seconds of each animation
