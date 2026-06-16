@@ -13,7 +13,7 @@
  * NOTE:
  *  Take into consideration if your WS2812 is a RGB or RGBW variant.
  *
- *  If it is RGBW, you need to set IS_RGBW to true and provide 4 bytes per 
+ *  If it is RGBW, you need to set RGBW to true and provide 4 bytes per 
  *  pixel (Red, Green, Blue, White) and use urgbw_u32().
  *
  *  If it is RGB, set IS_RGBW to false and provide 3 bytes per pixel (Red,
@@ -40,7 +40,7 @@ static inline uint32_t urgbw_u32(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
             (uint32_t)(b);
 }
 
-void pattern_snakes(ws2812& strip, uint t) {
+static void pattern_snakes(ws2812& strip, uint t) {
     for (uint i = 0; i < NUM_PIXELS; ++i) {
         uint x = (i + (t >> 1)) % 64;
         if (x < 10)
@@ -54,7 +54,7 @@ void pattern_snakes(ws2812& strip, uint t) {
     }
 }
 
-void pattern_random(ws2812& strip, uint t) {
+static void pattern_random(ws2812& strip, uint t) {
   if (t % 8) return;
   for (uint i = 0; i < NUM_PIXELS; ++i) {
     uint32_t color = get_rand_32();
@@ -62,14 +62,14 @@ void pattern_random(ws2812& strip, uint t) {
   }
 }
 
-void pattern_sparkle(ws2812& strip, uint t) {
+static void pattern_sparkle(ws2812& strip, uint t) {
     if (t % 8)
         return;
     for (uint i = 0; i < NUM_PIXELS; ++i)
         strip.put_pixel(rand() % 16 ? 0 : urgbw_u32(0xFF, 0xFF, 0xFF, 0xFF));
 }
 
-void pattern_greys(ws2812& strip, uint t) {
+static void pattern_greys(ws2812& strip, uint t) {
     uint max = 100; // let's not draw too much current!
     t %= max;
     for (uint i = 0; i < NUM_PIXELS; ++i) {
@@ -109,7 +109,8 @@ bool ws2812::init() {
   sm_config_set_out_shift(&c, false, true, RGBW ? 32 : 24);
   sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
-  int cycles_per_bit = 10; // ws2812_T1 + ws2812_T2 + ws2812_T3
+  // ws2812_T1 + ws2812_T2 + ws2812_T3
+  int cycles_per_bit = 10;
   float div = clock_get_hz(clk_sys) / (FREQ * cycles_per_bit);
   sm_config_set_clkdiv(&c, div);
 
@@ -119,14 +120,20 @@ bool ws2812::init() {
   return true;
 }
 
-void ws2812::show() {
+static int get_pat() {
+    return rand() % count_of(pattern_table);
+}
 
-    int t = 0; 
-    int pat = rand() % count_of(pattern_table);
-    int dir = (rand() >> 30) & 1 ? 1 : -1;
-    for (int i = 0; i < 1000; ++i) {
-        pattern_table[pat].pat(*this, t);
-        sleep_ms(10);
-        t += dir;
-    }
+static int get_dir() {
+    return (rand() >> 30) & 1 ? 1 : -1;
+}
+
+void ws2812::show(uint16_t cycles) {
+  if (cycles == 0) {
+    pat = get_pat();
+    dir = get_dir();
+  }
+
+  pattern_table[pat].pat(*this, t);
+  t += dir;
 }
