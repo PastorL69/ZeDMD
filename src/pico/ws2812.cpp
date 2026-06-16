@@ -70,11 +70,10 @@ static void pattern_sparkle(ws2812& strip, uint t) {
 }
 
 static void pattern_greys(ws2812& strip, uint t) {
-    uint max = 100; // let's not draw too much current!
-    t %= max;
+    t %= BRIGHTNESS;
     for (uint i = 0; i < NUM_PIXELS; ++i) {
         strip.put_pixel(t * 0x10101);
-        if (++t >= max) t = 0;
+        if (++t >= BRIGHTNESS) t = 0;
     }
 }
 
