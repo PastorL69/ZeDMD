@@ -14,6 +14,7 @@
 
 #ifdef PICO_RP2350
 #include "hardware/clocks.h"
+#include "pico/ws2812.h"
 #endif
 
 #ifdef PICO_BUILD
@@ -102,6 +103,7 @@ const uint8_t CtrlChars[6]
 uint8_t numCtrlCharsFound = 0;
 
 DisplayDriver *display;
+ws2812 led_strip;
 
 // Buffers for storing data
 uint8_t *buffers[NUM_BUFFERS];
@@ -2715,26 +2717,35 @@ void setup1() {
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
+  led_strip.init();
+  digitalWrite(LED_BUILTIN, HIGH);
+
   core_1_initialized = true;
 }
 
 void loop1() {
-  auto *spiTransport = static_cast<SpiTransport *>(transport);
 
-  if (!spiTransport->isDmdReaderInitialized()) {
-    spiTransport->initDmdReader();
-    // Blink to indicate that loopback mode is active but DMD reader is not yet
-    // initialized.
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(300);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-    return;
-  } else if (!transport->isLoopback()) {
-    dmdreader_spi_send();
-    tight_loop_contents();
-  } else {
-    delay(1);
-  }
+  led_strip.show();
+  delay(1600);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(400);
+  digitalWrite(LED_BUILTIN, HIGH);
+  //auto *spiTransport = static_cast<SpiTransport *>(transport);
+
+  //if (!spiTransport->isDmdReaderInitialized()) {
+  //  spiTransport->initDmdReader();
+  //  // Blink to indicate that loopback mode is active but DMD reader is not yet
+  //  // initialized.
+  //  digitalWrite(LED_BUILTIN, HIGH);
+  //  delay(300);
+  //  digitalWrite(LED_BUILTIN, LOW);
+  //  delay(200);
+  //  return;
+  //} else if (!transport->isLoopback()) {
+  //  dmdreader_spi_send();
+  //  tight_loop_contents();
+  //} else {
+  //  delay(1);
+  //}
 }
 #endif
