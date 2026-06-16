@@ -2731,7 +2731,8 @@ void loop1() {
   static uint16_t cycles = 0;
   static uint32_t lastStripShow = 0;
 
-  if (lastStripShow == 0 || now - lastStripShow >= 10) {
+  if ((lastStripShow == 0 || now - lastStripShow >= 10) &&
+      spiTransport->isDmdReaderInitialized()) {
     lastStripShow = now;
     led_strip.show(cycles);
     if (++cycles >= MAX_CYCLES) cycles = 0;

@@ -85,7 +85,7 @@ const struct {
         {pattern_snakes,  "Snakes!"},
         {pattern_random,  "Random data"},
         {pattern_sparkle, "Sparkles"},
-        {pattern_greys,   "Greys"},
+        //{pattern_greys,   "Greys"},
 };
 
 bool ws2812::deinit() {
