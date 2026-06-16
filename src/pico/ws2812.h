@@ -13,7 +13,7 @@
 #include "hardware/clocks.h"
 #include "main.h"
 
-#define LEFT_SPEAKER_PIN 21
+#define LEFT_SPEAKER_PIN 24
 #define RIGHT_SPEAKER_PIN 22
 #define RGBW false
 #define NUM_PIXELS 10
