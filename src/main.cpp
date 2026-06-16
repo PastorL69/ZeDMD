@@ -15,6 +15,7 @@
 #ifdef PICO_RP2350
 #include "hardware/clocks.h"
 #include "pico/ws2812.h"
+ws2812 led_strip;
 #endif
 
 #ifdef PICO_BUILD
@@ -103,7 +104,6 @@ const uint8_t CtrlChars[6]
 uint8_t numCtrlCharsFound = 0;
 
 DisplayDriver *display;
-ws2812 led_strip;
 
 // Buffers for storing data
 uint8_t *buffers[NUM_BUFFERS];
