@@ -13,7 +13,7 @@
 #include "hardware/clocks.h"
 #include "main.h"
 
-#define LEFT_SPEAKER_PIN 24
+#define LEFT_SPEAKER_PIN 21
 #define RGBW false
 #define NUM_PIXELS 16
 #define FREQ 800000 // 800khz speed
