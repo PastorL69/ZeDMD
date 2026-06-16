@@ -2725,7 +2725,7 @@ void setup1() {
 
 void loop1() {
 
-  // auto *spiTransport = static_cast<SpiTransport *>(transport);
+  auto *spiTransport = static_cast<SpiTransport *>(transport);
   
   const uint32_t now = millis();
   static uint16_t cycles = 0;
@@ -2737,20 +2737,21 @@ void loop1() {
     if (++cycles >= MAX_CYCLES) cycles = 0;
   }
 
-  //if (!spiTransport->isDmdReaderInitialized()) {
-  //  spiTransport->initDmdReader();
-  //  // Blink to indicate that loopback mode is active but DMD reader is not yet
-  //  // initialized.
-  //  digitalWrite(LED_BUILTIN, HIGH);
-  //  delay(300);
-  //  digitalWrite(LED_BUILTIN, LOW);
-  //  delay(200);
-  //  return;
-  //} else if (!transport->isLoopback()) {
-  //  dmdreader_spi_send();
-  //  tight_loop_contents();
-  //} else {
-  //  delay(1);
-  //}
+  if (!spiTransport->isDmdReaderInitialized()) {
+    return;
+    spiTransport->initDmdReader();
+    // Blink to indicate that loopback mode is active but DMD reader is not yet
+    // initialized.
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(300);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(200);
+    // return;
+  } else if (!transport->isLoopback()) {
+    dmdreader_spi_send();
+    tight_loop_contents();
+  } else {
+    delay(1);
+  }
 }
 #endif
