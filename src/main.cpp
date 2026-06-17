@@ -2719,6 +2719,7 @@ void setup1() {
 
   led_strip.init();
   digitalWrite(LED_BUILTIN, HIGH);
+  led_strip.show(0);
 
   core_1_initialized = true;
 }
