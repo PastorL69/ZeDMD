@@ -6,7 +6,7 @@
 .pio_version 0 // only requires PIO version 0
 
 .program ws2812
-.side_set 3
+.side_set 2
 
 ; The following constants are selected for broad compatibility with WS2812,
 ; WS2812B, and SK6812 LEDs. Other constants may support higher bandwidths for
@@ -18,10 +18,10 @@
 
 .wrap_target
 bitloop:
-    out x, 1       side 0 [T3 - 1] ; Side-set still takes place when instruction stalls
-    jmp !x do_zero side 1 [T1 - 1] ; Branch on the bit we shifted out. Positive pulse
+    out x, 1       side 0b00 [T3 - 1] ; Side-set still takes place when instruction stalls
+    jmp !x do_zero side 0b11 [T1 - 1] ; Branch on the bit we shifted out. Positive pulse
 do_one:
-    jmp  bitloop   side 1 [T2 - 1] ; Continue driving high, for a long pulse
+    jmp  bitloop   side 0b11 [T2 - 1] ; Continue driving high, for a long pulse
 do_zero:
-    nop            side 0 [T2 - 1] ; Or drive low, for a short pulse
+    nop            side 0b00 [T2 - 1] ; Or drive low, for a short pulse
 .wrap
