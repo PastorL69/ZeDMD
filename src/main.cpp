@@ -2740,7 +2740,6 @@ void loop1() {
   }
 
   if (!spiTransport->isDmdReaderInitialized()) {
-    return;
     spiTransport->initDmdReader();
     // Blink to indicate that loopback mode is active but DMD reader is not yet
     // initialized.
