@@ -110,10 +110,15 @@ bool ws2812::init() {
   pio_sm_config c =
       PARALLEL ? ws2812_parallel_program_get_default_config(m_programOffset)
                : ws2812_program_get_default_config(m_programOffset);
+
   if (!PARALLEL) {
     sm_config_set_sideset_pins(&c, PIN_BASE);
+    sm_config_set_out_shift(&c, false, true, RGBW ? 32 : 24);
+  } else {
+    sm_config_set_out_shift(&c, true, true, 32);
+    sm_config_set_out_pins(&c, PIN_BASE, PIN_COUNT);
   }
-  sm_config_set_out_shift(&c, false, true, RGBW ? 32 : PARALLEL ? 32 : 24);
+
   sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
   // ws2812_T1 + ws2812_T2 + ws2812_T3
