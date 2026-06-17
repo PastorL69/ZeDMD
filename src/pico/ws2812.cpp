@@ -96,23 +96,23 @@ bool ws2812::deinit() {
 
 bool ws2812::init() {
     pio_claim_free_sm_and_add_program_for_gpio_range(
-        &ws2812_program, &m_pio, &m_stateMachine, &m_programOffset,
-        PIN_BASE, 1, true);
+        PARALLEL ? &ws2812_parallel_program : &ws2812_program, &m_pio,
+        &m_stateMachine, &m_programOffset, PIN_BASE, 1, true);
 
-#ifdef PARALLEL
-    for(uint i=PIN_BASE; i<PIN_BASE+PIN_COUNT; i++) {
+    for (uint i = PIN_BASE; i < PIN_BASE + (PARALLEL ? PIN_COUNT : 1); i++) {
         pio_gpio_init(m_pio, i);
     }
-#else
-    pio_gpio_init(m_pio, PIN_BASE);
-#endif
 
     pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine,
-                                   PIN_BASE,
-                                   PARALLEL ? PIN_COUNT : 1, true);
+                                    PIN_BASE,
+                                    PARALLEL ? PIN_COUNT : 1, true);
 
-    pio_sm_config c = ws2812_program_get_default_config(m_programOffset);
-    sm_config_set_sideset_pins(&c, PIN_BASE);
+    pio_sm_config c =
+        PARALLEL ? ws2812_parallel_program_get_default_config(m_programOffset)
+                    : ws2812_program_get_default_config(m_programOffset);
+    if (!PARALLEL) {
+        sm_config_set_sideset_pins(&c, PIN_BASE);
+    }
     sm_config_set_out_shift(&c, false, true, RGBW ? 32 : PARALLEL ? 32 : 24);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 

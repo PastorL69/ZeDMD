@@ -27,6 +27,7 @@ class ws2812 {
   bool init();
   bool deinit();
 
+  // updates the ARGB strip
   void show(uint16_t cycles);
 
   inline void put_pixel(uint32_t pixel) {
