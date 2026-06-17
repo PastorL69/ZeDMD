@@ -13,32 +13,31 @@
 #include "hardware/clocks.h"
 #include "main.h"
 
-#define PARALLEL true
-#define PIN_BASE 23
-#define PIN_COUNT 2
 #define RGBW false
-#define NUM_PIXELS 50
 #define FREQ 800000 // 800khz speed
 #define BRIGHTNESS 15 // 0-255, 25 is already really bright
 #define MAX_CYCLES 1000 // 10 seconds of each animation
 
 class ws2812 {
  public:
-  bool init();
+  // Set the base GPIO pin, number of pixels and whether to use parallel output (2 pins)
+  bool init(uint8_t pin_base,  uint8_t num_pixels, bool parallel);
   bool deinit();
 
-  // updates the ARGB strip
+  // updates the ARGB strip, cycle count and number of pixels must be provided.
   void show(uint16_t cycles);
 
+  // pushes a uint32_t color value into the sm 
   inline void put_pixel(uint32_t pixel) {
     pio_sm_put_blocking(m_pio, m_stateMachine, RGBW ? pixel : pixel << 8u);
   }
 
  private:
 
+  uint8_t num_pixels;
   int t = 0;
-  int pat = 0;
-  int dir = 1;
+  int pat;
+  int dir;
 
   PIO m_pio;
   uint m_stateMachine;

@@ -40,8 +40,8 @@ static inline uint32_t urgbw_u32(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
             (uint32_t)(b);
 }
 
-static void pattern_snakes(ws2812& strip, uint t) {
-    for (uint i = 0; i < NUM_PIXELS; ++i) {
+static void pattern_snakes(ws2812& strip, uint t, uint8_t num_pixels) {
+    for (uint i = 0; i < num_pixels; ++i) {
         uint x = (i + (t >> 1)) % 64;
         if (x < 10)
             strip.put_pixel(urgb_u32(0xff, 0, 0));
@@ -54,30 +54,30 @@ static void pattern_snakes(ws2812& strip, uint t) {
     }
 }
 
-static void pattern_random(ws2812& strip, uint t) {
+static void pattern_random(ws2812& strip, uint t, uint8_t num_pixels) {
   if (t % 8) return;
-  for (uint i = 0; i < NUM_PIXELS; ++i) {
+  for (uint i = 0; i < num_pixels; ++i) {
     uint32_t color = get_rand_32();
     strip.put_pixel(urgbw_u32(color >> 24, color >> 16, color >> 8, color));
   }
 }
 
-static void pattern_sparkle(ws2812& strip, uint t) {
+static void pattern_sparkle(ws2812& strip, uint t, uint8_t num_pixels) {
     if (t % 8)
         return;
-    for (uint i = 0; i < NUM_PIXELS; ++i)
+    for (uint i = 0; i < num_pixels; ++i)
         strip.put_pixel(rand() % 16 ? 0 : urgbw_u32(0xFF, 0xFF, 0xFF, 0xFF));
 }
 
-static void pattern_greys(ws2812& strip, uint t) {
+static void pattern_greys(ws2812& strip, uint t, uint8_t num_pixels) {
     t %= BRIGHTNESS;
-    for (uint i = 0; i < NUM_PIXELS; ++i) {
+    for (uint i = 0; i < num_pixels; ++i) {
         strip.put_pixel(t * 0x10101);
         if (++t >= BRIGHTNESS) t = 0;
     }
 }
 
-typedef void (*pattern)(ws2812& strip, uint t);
+typedef void (*pattern)(ws2812& strip, uint t, uint8_t num_pixels);
 const struct {
     pattern pat;
     const char *name;
@@ -94,21 +94,22 @@ bool ws2812::deinit() {
   return true;
 }
 
-bool ws2812::init() {
+bool ws2812::init(uint8_t pin_base,  uint8_t num_pixels, bool parallel) {
+  num_pixels = num_pixels;
   pio_claim_free_sm_and_add_program_for_gpio_range(
-      &ws2812_program, &m_pio, &m_stateMachine, &m_programOffset, PIN_BASE,
-      PARALLEL ? PIN_COUNT : 1, true);
+      &ws2812_program, &m_pio, &m_stateMachine, &m_programOffset, pin_base,
+      parallel ? 2 : 1, true);
 
-  for (uint i = PIN_BASE; i < PIN_BASE + (PARALLEL ? PIN_COUNT : 1); i++) {
+  for (uint i = pin_base; i < pin_base + (parallel ? 2 : 1); i++) {
     pio_gpio_init(m_pio, i);
   }
 
-  pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine, PIN_BASE,
-                                 PARALLEL ? PIN_COUNT : 1, true);
+  pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine, pin_base,
+                                 parallel ? 2 : 1, true);
 
   pio_sm_config c = ws2812_program_get_default_config(m_programOffset);
 
-  sm_config_set_sideset_pins(&c, PIN_BASE);
+  sm_config_set_sideset_pins(&c, pin_base);
   sm_config_set_out_shift(&c, false, true, RGBW ? 32 : 24);
 
   sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
@@ -138,6 +139,6 @@ void ws2812::show(uint16_t cycles) {
     dir = get_dir();
   }
 
-  pattern_table[pat].pat(*this, t);
+  pattern_table[pat].pat(*this, t, num_pixels);
   t += dir;
 }

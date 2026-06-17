@@ -16,6 +16,7 @@
 #include "hardware/clocks.h"
 #include "pico/ws2812.h"
 ws2812 led_strip;
+ws2812 led_strip2;
 #endif
 
 #ifdef PICO_BUILD
@@ -2717,9 +2718,9 @@ void setup1() {
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
-  led_strip.init();
+  led_strip.init(21, 16, true);
+  led_strip2.init(23, 16, true);
   digitalWrite(LED_BUILTIN, HIGH);
-  led_strip.show(0);
 
   core_1_initialized = true;
 }
@@ -2735,6 +2736,7 @@ void loop1() {
   if ((lastStripShow == 0 || now - lastStripShow >= 10)) {
     lastStripShow = now;
     led_strip.show(cycles);
+    led_strip2.show(cycles);
     if (++cycles >= MAX_CYCLES) cycles = 0;
   }
 
