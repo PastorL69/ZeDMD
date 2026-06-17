@@ -2717,7 +2717,7 @@ void setup1() {
   speakerLights = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
   speakerLights->init();
   speakerLights->setBrightness(30);
-  speakerLights->setSpeed(10);
+  speakerLights->setSpeed(100);
   speakerLights->setMode(FX_MODE_RAINBOW_CYCLE);
   speakerLights->start();
 
@@ -2730,7 +2730,7 @@ void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
 
   speakerLights->service();
-  delay(10);
+  delay(15);
 
   if (!spiTransport->isDmdReaderInitialized()) {
     return;
