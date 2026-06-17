@@ -95,13 +95,14 @@ bool ws2812::deinit() {
 }
 
 bool ws2812::init() {
-    pio_claim_free_sm_and_add_program_for_gpio_range(
-        PARALLEL ? &ws2812_parallel_program : &ws2812_program, &m_pio,
-        &m_stateMachine, &m_programOffset, PIN_BASE, 1, true);
+  pio_claim_free_sm_and_add_program_for_gpio_range(
+      PARALLEL ? &ws2812_parallel_program : &ws2812_program, &m_pio,
+      &m_stateMachine, &m_programOffset, PIN_BASE, PARALLEL ? PIN_COUNT : 1,
+      true);
 
-    for (uint i = PIN_BASE; i < PIN_BASE + (PARALLEL ? PIN_COUNT : 1); i++) {
-        pio_gpio_init(m_pio, i);
-    }
+  for (uint i = PIN_BASE; i < PIN_BASE + (PARALLEL ? PIN_COUNT : 1); i++) {
+    pio_gpio_init(m_pio, i);
+  }
 
     pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine,
                                     PIN_BASE,
