@@ -14,7 +14,7 @@
 #include "main.h"
 
 #define LEFT_SPEAKER_PIN 21
-#define RGBW false
+#define RGBW true
 #define NUM_PIXELS 50
 #define FREQ 800000 // 800khz speed
 #define BRIGHTNESS 15 // 0-255, 25 is already really bright
