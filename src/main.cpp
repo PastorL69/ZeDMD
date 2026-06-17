@@ -2716,8 +2716,8 @@ void setup1() {
   }
   speakerLights = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
   speakerLights->init();
-  speakerLights->setBrightness(40);
-  speakerLights->setSpeed(200);
+  speakerLights->setBrightness(30);
+  speakerLights->setSpeed(75);
   speakerLights->setMode(FX_MODE_RAINBOW_CYCLE);
   speakerLights->start();
 
