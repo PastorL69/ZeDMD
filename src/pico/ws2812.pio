@@ -6,7 +6,7 @@
 .pio_version 0 // only requires PIO version 0
 
 .program ws2812
-.side_set 1
+.side_set 4
 
 ; The following constants are selected for broad compatibility with WS2812,
 ; WS2812B, and SK6812 LEDs. Other constants may support higher bandwidths for
@@ -24,17 +24,4 @@ do_one:
     jmp  bitloop   side 1 [T2 - 1] ; Continue driving high, for a long pulse
 do_zero:
     nop            side 0 [T2 - 1] ; Or drive low, for a short pulse
-.wrap
-
-.program ws2812_parallel
-
-.define public T1 3
-.define public T2 3
-.define public T3 4
-
-.wrap_target
-    out x, 32
-    mov pins, !null [T1-1]
-    mov pins, x     [T2-1]
-    mov pins, null  [T3-2]
 .wrap
