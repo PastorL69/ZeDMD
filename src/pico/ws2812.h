@@ -21,7 +21,7 @@
 class ws2812 {
  public:
   // Set the base GPIO pin, number of pixels and whether to use parallel output (2 pins)
-  bool init(uint8_t pin_base,  uint8_t num_pixels, bool parallel);
+  bool init(uint8_t pin_base,  uint8_t count, bool parallel);
   bool deinit();
 
   // updates the ARGB strip, cycle count and number of pixels must be provided.
@@ -34,7 +34,7 @@ class ws2812 {
 
  private:
 
-  uint8_t num_pixels = 16;
+  uint8_t num_pixels;
   int t = 0;
   int pat;
   int dir;
