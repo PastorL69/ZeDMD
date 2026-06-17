@@ -15,7 +15,7 @@
 
 #define RGBW false
 #define FREQ 800000 // 800khz speed
-#define BRIGHTNESS 15 // 0-255, 25 is already really bright
+#define BRIGHTNESS 40 // 0-255, 25 is already really bright
 #define MAX_CYCLES 1000 // 10 seconds of each animation
 
 class ws2812 {

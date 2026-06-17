@@ -2718,8 +2718,8 @@ void setup1() {
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
-  led_strip.init(21, 16, true);
-  led_strip2.init(23, 16, true);
+  led_strip.init(21, 200, true);
+  led_strip2.init(23, 200, true);
 
   core_1_initialized = true;
 }
