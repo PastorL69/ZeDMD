@@ -2730,6 +2730,7 @@ void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
 
   speakerLights->service();
+  delay(10);
 
   if (!spiTransport->isDmdReaderInitialized()) {
     return;
