@@ -2716,9 +2716,9 @@ void setup1() {
   }
   speakerLights = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
   speakerLights->init();
-  speakerLights->setBrightness(30);
+  speakerLights->setBrightness(10);
   //speakerLights->setSpeed(100);
-  speakerLights->setMode(FX_MODE_TWINKLE_FADE);
+  speakerLights->setMode(FX_MODE_CHASE_RANDOM);
   speakerLights->start();
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
