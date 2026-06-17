@@ -27,7 +27,7 @@
 #else
 #include <dmdreader.h>
 #include <WS2812FX.h>
-WS2812FX *speakerLightsLeft;
+WS2812FX *speakerLights;
 #endif
 #include "transports/spi_transport.h"
 #ifndef ZEDMD_NO_NETWORKING
@@ -2714,12 +2714,12 @@ void setup1() {
   while (!core_0_initialized) {
     delay(1);
   }
-  speakerLightsLeft = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
-  speakerLightsLeft->init();
-  speakerLightsLeft->setBrightness(40);
-  speakerLightsLeft->setSpeed(200);
-  speakerLightsLeft->setMode(FX_MODE_RAINBOW_CYCLE);
-  speakerLightsLeft->start();
+  speakerLights = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
+  speakerLights->init();
+  speakerLights->setBrightness(40);
+  speakerLights->setSpeed(200);
+  speakerLights->setMode(FX_MODE_RAINBOW_CYCLE);
+  speakerLights->start();
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
@@ -2729,7 +2729,7 @@ void setup1() {
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
 
-  speakerLightsLeft->service();
+  speakerLights->service();
 
   if (!spiTransport->isDmdReaderInitialized()) {
     return;
