@@ -13,8 +13,8 @@
 #include "hardware/clocks.h"
 #include "main.h"
 
-#define PARALLEL false
-#define PIN_BASE 24
+#define PARALLEL true
+#define PIN_BASE 21
 #define PIN_COUNT 4
 #define RGBW false
 #define NUM_PIXELS 50
