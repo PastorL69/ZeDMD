@@ -104,28 +104,27 @@ bool ws2812::init() {
     pio_gpio_init(m_pio, i);
   }
 
-    pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine,
-                                    PIN_BASE,
-                                    PARALLEL ? PIN_COUNT : 1, true);
+  pio_sm_set_consecutive_pindirs(m_pio, m_stateMachine, PIN_BASE,
+                                 PARALLEL ? PIN_COUNT : 1, true);
 
-    pio_sm_config c =
-        PARALLEL ? ws2812_parallel_program_get_default_config(m_programOffset)
-                    : ws2812_program_get_default_config(m_programOffset);
-    if (!PARALLEL) {
-        sm_config_set_sideset_pins(&c, PIN_BASE);
-    }
-    sm_config_set_out_shift(&c, false, true, RGBW ? 32 : PARALLEL ? 32 : 24);
-    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+  pio_sm_config c =
+      PARALLEL ? ws2812_parallel_program_get_default_config(m_programOffset)
+               : ws2812_program_get_default_config(m_programOffset);
+  if (!PARALLEL) {
+    sm_config_set_sideset_pins(&c, PIN_BASE);
+  }
+  sm_config_set_out_shift(&c, false, true, RGBW ? 32 : PARALLEL ? 32 : 24);
+  sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
-    // ws2812_T1 + ws2812_T2 + ws2812_T3
-    int cycles_per_bit = 10;
-    float div = clock_get_hz(clk_sys) / (FREQ * cycles_per_bit);
-    sm_config_set_clkdiv(&c, div);
+  // ws2812_T1 + ws2812_T2 + ws2812_T3
+  int cycles_per_bit = 10;
+  float div = clock_get_hz(clk_sys) / (FREQ * cycles_per_bit);
+  sm_config_set_clkdiv(&c, div);
 
-    pio_sm_init(m_pio, m_stateMachine, m_programOffset, &c);
-    pio_sm_set_enabled(m_pio, m_stateMachine, true);
+  pio_sm_init(m_pio, m_stateMachine, m_programOffset, &c);
+  pio_sm_set_enabled(m_pio, m_stateMachine, true);
 
-    return true;
+  return true;
 }
 
 static int get_pat() {
