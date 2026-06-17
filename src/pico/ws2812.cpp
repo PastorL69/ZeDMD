@@ -94,7 +94,7 @@ bool ws2812::deinit() {
   return true;
 }
 
-bool ws2812::init(uint8_t pin_base,  uint8_t num_pixels, bool parallel) {
+bool ws2812::init(uint8_t pin_base, uint8_t num_pixels, bool parallel) {
   num_pixels = num_pixels;
   pio_claim_free_sm_and_add_program_for_gpio_range(
       &ws2812_program, &m_pio, &m_stateMachine, &m_programOffset, pin_base,

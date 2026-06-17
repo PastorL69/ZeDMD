@@ -2719,7 +2719,7 @@ void setup1() {
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
   led_strip.init(21, 16, true);
-  led_strip2.init(23, 16, true);
+  //led_strip2.init(23, 16, true);
   digitalWrite(LED_BUILTIN, HIGH);
 
   core_1_initialized = true;
@@ -2736,7 +2736,7 @@ void loop1() {
   if ((lastStripShow == 0 || now - lastStripShow >= 10)) {
     lastStripShow = now;
     led_strip.show(cycles);
-    led_strip2.show(cycles);
+    //led_strip2.show(cycles);
     if (++cycles >= MAX_CYCLES) cycles = 0;
   }
 

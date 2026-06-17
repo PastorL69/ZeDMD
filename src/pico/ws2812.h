@@ -34,7 +34,7 @@ class ws2812 {
 
  private:
 
-  uint8_t num_pixels;
+  uint8_t num_pixels = 16;
   int t = 0;
   int pat;
   int dir;
