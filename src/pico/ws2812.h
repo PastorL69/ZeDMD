@@ -34,10 +34,10 @@ class ws2812 {
 
  private:
 
-  uint8_t num_pixels = 16;
+  uint8_t num_pixels;
   int t = 0;
-  int pat = 0;
-  int dir = 1;
+  int pat;
+  int dir;
 
   PIO m_pio;
   uint m_stateMachine;
