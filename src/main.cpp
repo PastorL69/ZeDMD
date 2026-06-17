@@ -2712,6 +2712,12 @@ void setup1() {
   while (!core_0_initialized) {
     delay(1);
   }
+  delay(2000);
+  Serial.println("Core 1 started");
+  delay(1000);
+  #if defined(ARDUINO_ARCH_RP2040)
+  Serial.println("matches");
+  #endif
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
