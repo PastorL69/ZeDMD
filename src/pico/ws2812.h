@@ -36,8 +36,8 @@ class ws2812 {
 
   uint8_t num_pixels = 16;
   int t = 0;
-  int pat;
-  int dir;
+  int pat = 0;
+  int dir = 1;
 
   PIO m_pio;
   uint m_stateMachine;
