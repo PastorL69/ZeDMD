@@ -26,6 +26,8 @@
 #include "transports/usb_transport.h"
 #else
 #include <dmdreader.h>
+#include <WS2812FX.h>
+WS2812FX *speakerLightsLeft;
 #endif
 #include "transports/spi_transport.h"
 #ifndef ZEDMD_NO_NETWORKING
@@ -2712,12 +2714,12 @@ void setup1() {
   while (!core_0_initialized) {
     delay(1);
   }
-  delay(2000);
-  Serial.println("Core 1 started");
-  delay(1000);
-  #if defined(ARDUINO_ARCH_RP2040)
-  Serial.println("matches");
-  #endif
+  speakerLightsLeft = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
+  speakerLightsLeft->init();
+  speakerLightsLeft->setBrightness(40);
+  speakerLightsLeft->setSpeed(200);
+  speakerLightsLeft->setMode(FX_MODE_RAINBOW_CYCLE);
+  speakerLightsLeft->start();
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
 
@@ -2727,7 +2729,10 @@ void setup1() {
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
 
+  speakerLightsLeft->service();
+
   if (!spiTransport->isDmdReaderInitialized()) {
+    return;
     spiTransport->initDmdReader();
     // Blink to indicate that loopback mode is active but DMD reader is not yet
     // initialized.
