@@ -38,7 +38,7 @@ jobs:
     needs: [ version ]
     strategy:
       matrix:
-        panels: ['pico2_128x32_ppucdmd', 'pico2_256x64_ppucdmd', 'pico2_128x64x2_ppucdmd', 'ppucdmd_128x16', 'ppucdmd_128x32', 'ppucdmd_192x64', 'ppucdmd_256x64', 'ppucdmd_128x64x2', 'ppucdmd_128x32_speakerlights', 'ppucdmd_256x64_speakerlights', 'ppucdmd_128x64x2_speakerlights']
+        panels: ['pico2_128x32_ppucdmd', 'pico2_256x64_ppucdmd', 'pico2_128x64x2_ppucdmd', 'ppucdmd_128x16', 'ppucdmd_128x32', 'ppucdmd_192x64', 'ppucdmd_256x64', 'ppucdmd_128x64x2']
 
     name: ${{ matrix.panels }}
 
@@ -67,7 +67,7 @@ jobs:
           pio run -e ${{ matrix.panels }} -t buildfs
           pio run -e ${{ matrix.panels }} -t buildunified 2>&1 | tee build.log
           BUILD_DIR=.pio/build/${{ matrix.panels }}
-          
+
           OFFSET_BIN=$(( $(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
           cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
           truncate -s $OFFSET_BIN $BUILD_DIR/firmware_with_fs.bin
@@ -120,15 +120,6 @@ jobs:
             cd ../ppucdmd_128x64x2
             echo "${{ needs.version.outputs.tag }}" > version.txt
             zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_128x32_speakerlights
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_256x64_speakerlights
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_128x64x2_speakerlights
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2_speakerlights.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
             cd ..
       - name: Release
         uses: softprops/action-gh-release@v3
@@ -144,6 +135,3 @@ jobs:
             ppucdmd_192x64.zip
             ppucdmd_256x64.zip
             ppucdmd_128x64x2.zip
-            ppucdmd_128x32_speakerlights.zip
-            ppucdmd_256x64_speakerlights.zip
-            ppucdmd_128x64x2_speakerlights.zip

@@ -32,10 +32,6 @@
 #include "transports/wifi_transport.h"
 #endif
 
-#ifdef SPEAKER_LIGHTS
-#include <WS2812FX.h>
-#endif
-
 // Specific improvements and #define for the ESP32 S3 series
 #if defined(ARDUINO_ESP32_S3_N16R8) || defined(DISPLAY_RM67162_AMOLED)
 #include "S3Specific.h"
@@ -67,33 +63,6 @@
 #define RC 0
 #define GC 1
 #define BC 2
-
-#ifdef SPEAKER_LIGHTS
-#ifdef ARDUINO_ESP32_S3_N16R8
-#define SPEAKER_LIGHTS_LEFT_PIN 9    // Left speaker LED strip
-#define SPEAKER_LIGHTS_RIGHT_PIN 10  // Right speaker LED strip
-#elif defined(DMDREADER)
-#define SPEAKER_LIGHTS_LEFT_PIN 55   // Left speaker LED strip
-#define SPEAKER_LIGHTS_RIGHT_PIN 56  // Right speaker LED strip
-#endif
-
-#define FX_MODE_AMBILIGHT 200
-
-uint8_t speakerLightsLeftNumLeds;
-uint8_t speakerLightsRightNumLeds;
-uint8_t speakerLightsLeftLedType;
-uint8_t speakerLightsRightLedType;
-uint8_t speakerLightsLeftMode;
-uint8_t speakerLightsRightMode;
-uint32_t speakerLightsLeftColor;
-uint32_t speakerLightsRightColor;
-WS2812FX *speakerLightsLeft;
-WS2812FX *speakerLightsRight;
-
-uint8_t speakerLightsBlackThreshold;  // Ignore pixels below this brightness
-uint8_t speakerLightsGammaFactor;     // Scaling factor (0-256), higher = less
-                                      // black impact
-#endif
 
 const uint8_t FrameChars[5]
     __attribute__((aligned(4))) = {'F', 'R', 'A', 'M', 'E'};
@@ -652,109 +621,6 @@ void LoadColor() {
 }
 #endif
 
-#ifdef SPEAKER_LIGHTS
-void SaveSpeakerLightsSettings() {
-  File f = LittleFS.open("/speaker_lights_left_num.val", "w");
-  f.write(speakerLightsLeftNumLeds);
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_num.val", "w");
-  f.write(speakerLightsRightNumLeds);
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_type.val", "w");
-  f.write(speakerLightsLeftLedType);
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_type.val", "w");
-  f.write(speakerLightsRightLedType);
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_mode.val", "w");
-  f.write(speakerLightsLeftMode);
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_mode.val", "w");
-  f.write(speakerLightsRightMode);
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_color.val", "w");
-  f.write(speakerLightsLeftColor & 0xFF);
-  f.write((speakerLightsLeftColor >> 8) & 0xFF);
-  f.write((speakerLightsLeftColor >> 16) & 0xFF);
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_color.val", "w");
-  f.write(speakerLightsRightColor & 0xFF);
-  f.write((speakerLightsRightColor >> 8) & 0xFF);
-  f.write((speakerLightsRightColor >> 16) & 0xFF);
-  f.close();
-  f = LittleFS.open("/speaker_lights_black_threshold.val", "w");
-  f.write(speakerLightsBlackThreshold);
-  f.close();
-  f = LittleFS.open("/speaker_lights_gamma_factor.val", "w");
-  f.write(speakerLightsGammaFactor);
-  f.close();
-}
-
-void LoadSpeakerLightsSettings() {
-  File f = LittleFS.open("/speaker_lights_left_num.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsLeftNumLeds = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_num.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsRightNumLeds = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_type.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsLeftLedType = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_type.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsRightLedType = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_mode.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsLeftMode = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_mode.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsRightMode = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_left_color.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsLeftColor = f.read() + (f.read() << 8) + (f.read() << 16);
-  f.close();
-  f = LittleFS.open("/speaker_lights_right_color.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsRightColor = f.read() + (f.read() << 8) + (f.read() << 16);
-  f.close();
-  f = LittleFS.open("/speaker_lights_black_threshold.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsBlackThreshold = f.read();
-  f.close();
-  f = LittleFS.open("/speaker_lights_gamma_factor.val", "r");
-  if (!f) {
-    SaveSpeakerLightsSettings();
-  }
-  speakerLightsGammaFactor = f.read();
-  f.close();
-  // @todo LED Type and RGB order
-}
-#endif
-
 void LedTester(void) {
   display->FillScreen(255, 0, 0);
   display->Render();
@@ -842,21 +708,11 @@ void FpsUpdate() {
 }
 #endif
 
-uint8_t GetPixelBrightness(uint8_t r, uint8_t g, uint8_t b) {
-  return (r * 77 + g * 150 + b * 29) >> 8;  // Optimized luminance calculation
-}
-
 void Render(bool renderAll = true) {
 #ifdef DISPLAY_RM67162_AMOLED
   display->FillPanelRaw(renderBuffer[currentRenderBuffer]);
 #else
   if (NUM_RENDER_BUFFERS == 1 || currentRenderBuffer != lastRenderBuffer) {
-#ifdef SPEAKER_LIGHTS
-    uint32_t sumRLeft = 0, sumGLeft = 0, sumBLeft = 0, sumRRight = 0,
-             sumGRight = 0, sumBRight = 0;
-    uint16_t colorCountLeft = 0, blackCountLeft = 0, colorCountRight = 0,
-             blackCountRight = 0;
-#endif
     uint16_t pos;
 
     for (uint16_t y = 0; y < TOTAL_HEIGHT; y++) {
@@ -872,80 +728,10 @@ void Render(bool renderAll = true) {
                              renderBuffer[currentRenderBuffer][pos + 1],
                              renderBuffer[currentRenderBuffer][pos + 2]);
         }
-#ifdef SPEAKER_LIGHTS
-        if (FX_MODE_AMBILIGHT == speakerLightsLeftMode ||
-            FX_MODE_AMBILIGHT == speakerLightsRightMode) {
-          // Stern SAM ROMs have a big black zone on the left side of the screen
-          if (speakerLightsLeftNumLeds > 0 && x > TOTAL_WIDTH / 4 &&
-              x <= TOTAL_WIDTH / 2) {
-            if (GetPixelBrightness(renderBuffer[currentRenderBuffer][pos],
-                                   renderBuffer[currentRenderBuffer][pos + 1],
-                                   renderBuffer[currentRenderBuffer][pos + 2]) >
-                speakerLightsBlackThreshold) {
-              sumRLeft += renderBuffer[currentRenderBuffer][pos];
-              sumGLeft += renderBuffer[currentRenderBuffer][pos + 1];
-              sumBLeft += renderBuffer[currentRenderBuffer][pos + 2];
-              colorCountLeft++;
-            } else {
-              blackCountLeft++;
-            }
-          } else if (speakerLightsRightNumLeds > 0 &&
-                     x >= (TOTAL_WIDTH - (TOTAL_WIDTH / 4))) {
-            if (GetPixelBrightness(renderBuffer[currentRenderBuffer][pos],
-                                   renderBuffer[currentRenderBuffer][pos + 1],
-                                   renderBuffer[currentRenderBuffer][pos + 2]) >
-                speakerLightsBlackThreshold) {
-              sumRRight += renderBuffer[currentRenderBuffer][pos];
-              sumGRight += renderBuffer[currentRenderBuffer][pos + 1];
-              sumBRight += renderBuffer[currentRenderBuffer][pos + 2];
-              colorCountRight++;
-            } else {
-              blackCountRight++;
-            }
-          }
-        }
-#endif
       }
     }
 
     if (renderAll) display->Render();
-
-#ifdef SPEAKER_LIGHTS
-    if (FX_MODE_AMBILIGHT == speakerLightsLeftMode) {
-      if (colorCountLeft == 0) {
-        speakerLightsLeft->setColor(0);  // All black → Turn off LEDs
-      } else {
-        // Integer-based black influence calculation
-        uint16_t totalPixelsLeft = blackCountLeft + colorCountLeft;
-        uint16_t blackRatio256 =
-            (blackCountLeft * 256) / colorCountLeft;  // Scale to 0-256
-        // brightnessFactor = 256 if all color, lower if black is present
-        uint16_t brightnessFactor =
-            (256 - ((blackRatio256 * (256 - speakerLightsGammaFactor)) >> 8));
-        speakerLightsLeft->setColor(
-            (sumRLeft / colorCountLeft * brightnessFactor) >> 8,
-            (sumGLeft / colorCountLeft * brightnessFactor) >> 8,
-            (sumBLeft / colorCountLeft * brightnessFactor) >> 8);
-      }
-    }
-    if (FX_MODE_AMBILIGHT == speakerLightsRightMode) {
-      if (colorCountRight == 0) {
-        speakerLightsRight->setColor(0);  // All black → Turn off LEDs
-      } else {
-        // Integer-based black influence calculation
-        uint16_t totalPixelsRight = blackCountRight + colorCountRight;
-        uint16_t blackRatio256 =
-            (blackCountRight * 256) / colorCountRight;  // Scale to 0-256
-        // brightnessFactor = 256 if all color, lower if black is present
-        uint16_t brightnessFactor =
-            (256 - ((blackRatio256 * (256 - speakerLightsGammaFactor)) >> 8));
-        speakerLightsRight->setColor(
-            (sumRRight / colorCountRight * brightnessFactor) >> 8,
-            (sumGRight / colorCountRight * brightnessFactor) >> 8,
-            (sumBRight / colorCountRight * brightnessFactor) >> 8);
-      }
-    }
-#endif
     if (NUM_RENDER_BUFFERS > 1) {
       lastRenderBuffer = currentRenderBuffer;
       currentRenderBuffer = (currentRenderBuffer + 1) % NUM_RENDER_BUFFERS;
@@ -970,14 +756,6 @@ void ClearScreen() {
     currentRenderBuffer = (currentRenderBuffer + 1) % NUM_RENDER_BUFFERS;
   }
 
-#ifdef SPEAKER_LIGHTS
-  if (FX_MODE_AMBILIGHT == speakerLightsLeftMode) {
-    speakerLightsLeft->setColor(0);  // All black → Turn off LEDs
-  }
-  if (FX_MODE_AMBILIGHT == speakerLightsRightMode) {
-    speakerLightsRight->setColor(0);  // All black → Turn off LEDs
-  }
-#endif
 }
 
 void DisplayLogo() {
@@ -1595,181 +1373,6 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
           }
 #endif
 
-#ifdef SPEAKER_LIGHTS
-          case 100:  // set speakerLightsBlackThreshold
-          {
-            speakerLightsBlackThreshold = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 101:  // set speakerLightsGammaFactor
-          {
-            speakerLightsGammaFactor = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-          case 102:  // set speakerLightsLeftNumLeds
-          {
-            speakerLightsLeftNumLeds = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 103:  // set speakerLightsLeftLedType
-          {
-            speakerLightsLeftLedType = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 104:  // set speakerLightsLeftMode
-          {
-            speakerLightsLeftMode = pData[pos++];
-            if (speakerLightsLeftNumLeds > 0) {
-              speakerLightsLeft->setMode(speakerLightsLeftMode);
-            }
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 105:  // set speakerLightsLeftColor
-          {
-            if (payloadMissing == payloadSize) {
-              memset(tmpStringBuffer, 0, 3);
-              if (payloadMissing > (len - pos)) {
-                memcpy(tmpStringBuffer, &pData[pos], len - pos);
-                payloadMissing -= len - pos;
-                pos += len - pos;
-                break;
-              } else {
-                memcpy(tmpStringBuffer, &pData[pos], payloadSize);
-                speakerLightsLeftColor = tmpStringBuffer[0] +
-                                         (tmpStringBuffer[1] << 8) +
-                                         (tmpStringBuffer[2] << 16);
-                if (speakerLightsLeftNumLeds > 0) {
-                  speakerLightsLeft->setColor(speakerLightsLeftColor);
-                }
-                pos += payloadSize;
-                payloadMissing = 0;
-                headerBytesReceived = 0;
-                numCtrlCharsFound = 0;
-              }
-            } else {
-              if (payloadMissing > (len - pos)) {
-                memcpy(&tmpStringBuffer[payloadSize - payloadMissing],
-                       &pData[pos], len - pos);
-                payloadMissing -= len - pos;
-                pos += len - pos;
-                break;
-              } else {
-                memcpy(&tmpStringBuffer[payloadSize - payloadMissing],
-                       &pData[pos], payloadMissing);
-                speakerLightsLeftColor = tmpStringBuffer[0] +
-                                         (tmpStringBuffer[1] << 8) +
-                                         (tmpStringBuffer[2] << 16);
-                if (speakerLightsLeftNumLeds > 0) {
-                  speakerLightsLeft->setColor(speakerLightsLeftColor);
-                }
-                pos += payloadMissing;
-                payloadMissing = 0;
-                headerBytesReceived = 0;
-                numCtrlCharsFound = 0;
-              }
-            }
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 106:  // set speakerLightsRightNumLeds
-          {
-            speakerLightsRightNumLeds = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 107:  // set speakerLightsRightLedType
-          {
-            speakerLightsRightLedType = pData[pos++];
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 108:  // set speakerLightsRightMode
-          {
-            speakerLightsRightMode = pData[pos++];
-            if (speakerLightsRightNumLeds > 0) {
-              speakerLightsRight->setMode(speakerLightsRightMode);
-            }
-            headerBytesReceived = 0;
-            numCtrlCharsFound = 0;
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-
-          case 109:  // set speakerLightsRightColor
-          {
-            if (payloadMissing == payloadSize) {
-              memset(tmpStringBuffer, 0, 3);
-              if (payloadMissing > (len - pos)) {
-                memcpy(tmpStringBuffer, &pData[pos], len - pos);
-                payloadMissing -= len - pos;
-                pos += len - pos;
-                break;
-              } else {
-                memcpy(tmpStringBuffer, &pData[pos], payloadSize);
-                speakerLightsRightColor = tmpStringBuffer[0] +
-                                          (tmpStringBuffer[1] << 8) +
-                                          (tmpStringBuffer[2] << 16);
-                if (speakerLightsRightNumLeds > 0) {
-                  speakerLightsRight->setColor(speakerLightsRightColor);
-                }
-                pos += payloadSize;
-                payloadMissing = 0;
-                headerBytesReceived = 0;
-                numCtrlCharsFound = 0;
-              }
-            } else {
-              if (payloadMissing > (len - pos)) {
-                memcpy(&tmpStringBuffer[payloadSize - payloadMissing],
-                       &pData[pos], len - pos);
-                payloadMissing -= len - pos;
-                pos += len - pos;
-                break;
-              } else {
-                memcpy(&tmpStringBuffer[payloadSize - payloadMissing],
-                       &pData[pos], payloadMissing);
-                speakerLightsRightColor = tmpStringBuffer[0] +
-                                          (tmpStringBuffer[1] << 8) +
-                                          (tmpStringBuffer[2] << 16);
-                if (speakerLightsRightNumLeds > 0) {
-                  speakerLightsRight->setColor(speakerLightsRightColor);
-                }
-                pos += payloadMissing;
-                payloadMissing = 0;
-                headerBytesReceived = 0;
-                numCtrlCharsFound = 0;
-              }
-            }
-            if (transport->isWifiAndActive()) break;
-            return 1;
-          }
-#endif
-
           case 16: {
 #ifndef DMDREADER
             if (transport->getType() == Transport::USB) {
@@ -1940,20 +1543,6 @@ void setup() {
   shortId =
       (uint16_t)(chipId ^ (chipId >> 16) ^ (chipId >> 32) ^ (chipId >> 48));
 
-#ifdef SPEAKER_LIGHTS
-  speakerLightsLeftNumLeds = 0;
-  speakerLightsRightNumLeds = 0;
-  speakerLightsLeftLedType = NEO_GBR;
-  speakerLightsRightLedType = NEO_GBR;
-  speakerLightsLeftMode = FX_MODE_RAINBOW_CYCLE;
-  speakerLightsRightMode = FX_MODE_RAINBOW_CYCLE;
-  speakerLightsLeftColor = 0x555555;
-  speakerLightsRightColor = 0x555555;
-
-  speakerLightsBlackThreshold = 30;
-  speakerLightsGammaFactor = 180;
-#endif
-
   bool fileSystemOK;
   if ((fileSystemOK = LittleFS.begin())) {
     LoadSettingsMenu();
@@ -1972,9 +1561,6 @@ void setup() {
     LoadDebug();
 #ifdef ZEDMD_HD_HALF
     LoadYOffset();
-#endif
-#ifdef SPEAKER_LIGHTS
-    LoadSpeakerLightsSettings();
 #endif
   } else {
     TransportCreate();
@@ -2419,30 +2005,6 @@ void setup() {
     }
   }
 
-#ifdef SPEAKER_LIGHTS
-  if (speakerLightsLeftNumLeds > 0) {
-    speakerLightsLeft =
-        new WS2812FX(speakerLightsLeftNumLeds, SPEAKER_LIGHTS_LEFT_PIN,
-                     speakerLightsLeftLedType);
-    speakerLightsLeft->init();
-    speakerLightsLeft->setBrightness(100);
-    speakerLightsLeft->setSpeed(200);
-    speakerLightsLeft->setMode(speakerLightsLeftMode);
-    speakerLightsLeft->start();
-  }
-
-  if (speakerLightsRightNumLeds > 0) {
-    speakerLightsRight =
-        new WS2812FX(speakerLightsRightNumLeds, SPEAKER_LIGHTS_RIGHT_PIN,
-                     speakerLightsRightLedType);
-    speakerLightsRight->init();
-    speakerLightsRight->setBrightness(100);
-    speakerLightsRight->setSpeed(200);
-    speakerLightsRight->setMode(speakerLightsRightMode);
-    speakerLightsRight->start();
-  }
-#endif
-
 #ifdef DMDREADER
   static_cast<SpiTransport *>(transport)->SetColor((Color)loopbackColor);
 #endif
@@ -2455,16 +2017,6 @@ void setup() {
 
 void loop() {
   CheckMenuButton();
-
-#ifdef SPEAKER_LIGHTS
-  if (speakerLightsLeftNumLeds > 0) {
-    speakerLightsLeft->service();
-  }
-
-  if (speakerLightsRightNumLeds > 0) {
-    speakerLightsRight->service();
-  }
-#endif
 
 #ifdef DMDREADER
   if (!core_1_initialized) {
