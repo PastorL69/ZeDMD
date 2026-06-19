@@ -2728,32 +2728,31 @@ void setup1() {
 
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
-
-  //delay(400);
-
-  uint32_t before = micros();
+  static uint32_t lastDmdReaderInitAttempt = 0;
+  static bool countDmdReaderSignals = false;
 
   speakerLights->service();
 
-  uint32_t after = micros();
-
-  Serial.printf("Time before: %u\n", before);
-  Serial.printf("Time after: %u\n", after);
-  Serial.printf("Duration: %u us\n", after - before);
-
   if (!spiTransport->isDmdReaderInitialized()) {
+    const uint32_t now = millis();
+
+    if (lastDmdReaderInitAttempt == 0 ||
+        now - lastDmdReaderInitAttempt >= 750) {
+      spiTransport->initDmdReader();
+      lastDmdReaderInitAttempt = now;
+      countDmdReaderSignals = true;
+
+    } else if (countDmdReaderSignals && now - lastDmdReaderInitAttempt >= 250) {
+      spiTransport->initDmdReader();
+      lastDmdReaderInitAttempt = now;
+      countDmdReaderSignals = false;
+    }
     return;
-    spiTransport->initDmdReader();
-    // Blink to indicate that loopback mode is active but DMD reader is not yet
-    // initialized.
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(300);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-    return;
+
   } else if (!transport->isLoopback()) {
     dmdreader_spi_send();
     tight_loop_contents();
+
   } else {
     delay(1);
   }
