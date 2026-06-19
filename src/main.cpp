@@ -2721,7 +2721,7 @@ void setup1() {
   speakerLights->setMode(FX_MODE_COLOR_WIPE_RANDOM);
   speakerLights->start();
 
-  static_cast<SpiTransport *>(transport)->initDmdReader();
+  // static_cast<SpiTransport *>(transport)->initDmdReader();
 
   core_1_initialized = true;
 }
