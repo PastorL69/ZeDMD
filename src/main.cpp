@@ -2714,11 +2714,11 @@ void setup1() {
   while (!core_0_initialized) {
     delay(1);
   }
-  speakerLights = new WS2812FX(16, 24, NEO_GRB + NEO_KHZ800);
+  speakerLights = new WS2812FX(100, 24, NEO_GRB + NEO_KHZ800);
   speakerLights->init();
-  speakerLights->setBrightness(10);
-  //speakerLights->setSpeed(100);
-  speakerLights->setMode(FX_MODE_CHASE_RANDOM);
+  speakerLights->setBrightness(5);
+  speakerLights->setSpeed(500);
+  speakerLights->setMode(FX_MODE_COLOR_WIPE_RANDOM);
   speakerLights->start();
 
   static_cast<SpiTransport *>(transport)->initDmdReader();
@@ -2729,8 +2729,17 @@ void setup1() {
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
 
+  //delay(400);
+
+  uint32_t before = micros();
+
   speakerLights->service();
-  delay(20);
+
+  uint32_t after = micros();
+
+  Serial.printf("Time before: %u\n", before);
+  Serial.printf("Time after: %u\n", after);
+  Serial.printf("Duration: %u us\n", after - before);
 
   if (!spiTransport->isDmdReaderInitialized()) {
     return;
