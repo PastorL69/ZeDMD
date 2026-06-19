@@ -2265,26 +2265,36 @@ void setup1() {
     delay(1);
   }
 
-  static_cast<SpiTransport *>(transport)->initDmdReader();
-
+  delay(100);
   core_1_initialized = true;
 }
 
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
+  static uint32_t lastDmdReaderInitAttempt = 0;
+  static bool countDmdReaderSignals = false;
 
   if (!spiTransport->isDmdReaderInitialized()) {
-    spiTransport->initDmdReader();
-    // Blink to indicate that loopback mode is active but DMD reader is not yet
-    // initialized.
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(300);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
+    const uint32_t now = millis();
+
+    if (lastDmdReaderInitAttempt == 0 ||
+               now - lastDmdReaderInitAttempt >= RETRIGGER_DELAY) {
+      spiTransport->initDmdReader();
+      lastDmdReaderInitAttempt = now;
+      countDmdReaderSignals = true;
+
+    } else if (countDmdReaderSignals &&
+               now - lastDmdReaderInitAttempt >= COUNT_CLOCK_DELAY) {
+      spiTransport->initDmdReader();
+      lastDmdReaderInitAttempt = now;
+      countDmdReaderSignals = false;
+    }
     return;
+
   } else if (!transport->isLoopback()) {
     dmdreader_spi_send();
     tight_loop_contents();
+
   } else {
     delay(1);
   }
