@@ -2743,7 +2743,6 @@ void loop1() {
       countDmdReaderSignals = true;
 
     } else if (countDmdReaderSignals && now - lastDmdReaderInitAttempt >= 250) {
-      Serial.printf("time lost: %u", now - lastDmdReaderInitAttempt);
       spiTransport->initDmdReader();
       lastDmdReaderInitAttempt = now;
       countDmdReaderSignals = false;
