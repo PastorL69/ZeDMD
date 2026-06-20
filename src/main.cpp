@@ -2258,7 +2258,7 @@ void loop() {
 #endif
 }
 
-#ifndef DMDREADER
+#ifdef PICO_RP2350
 void setup1() {
   while (true) {
     digitalWrite(LED_BUILTIN, HIGH);
