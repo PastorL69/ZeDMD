@@ -2265,6 +2265,7 @@ void setup1() {
     delay(1);
   }
 
+  // not required, but slightly extend the splash screen duration
   delay(100);
   core_1_initialized = true;
 }
