@@ -2258,6 +2258,7 @@ void loop() {
 #endif
 }
 
+#ifndef DMDREADER
 void setup1() {
   while (true) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -2266,6 +2267,7 @@ void setup1() {
     delay(200);
   }
 }
+#endif
 
 #ifdef DMDREADER
 
