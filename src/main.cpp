@@ -2259,6 +2259,7 @@ void loop() {
 }
 
 #ifdef PICO_RP2350
+#ifndef DMDREADER
 void setup1() {
   while (true) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -2267,6 +2268,7 @@ void setup1() {
     delay(200);
   }
 }
+#endif
 #endif
 
 #ifdef DMDREADER
