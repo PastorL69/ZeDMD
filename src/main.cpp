@@ -60,6 +60,11 @@
 
 #define LED_CHECK_DELAY 1000  // ms per color
 
+// settings menu flashing text
+#define FLASH_BASE_DELAY 2250  // duration in ms until flashing begins
+#define FLASH_ON_DELAY 750     // on duration in ms when flashing
+#define FLASH_OFF_DELAY 200    // off duration in ms when flashing
+
 #define RC 0
 #define GC 1
 #define BC 2
@@ -1681,6 +1686,11 @@ void setup() {
     downButton->setPressedState(LOW);
 #endif
 
+    bool flashBaseDelay;
+    bool flashPosition;
+    uint16_t timeOutCounter = 0;
+    uint8_t red, green;
+
     uint8_t position = 1;
     bool firstMenuRendering = true;
     while (1) {
@@ -1692,7 +1702,14 @@ void setup() {
       backward = backwardButton->pressed();
 #endif
       bool buttonPressed = forward || backward;
-      if (buttonPressed) {
+      if ((buttonPressed || flashPosition) && ledTest == 0) {
+        if (timeOutCounter == FLASH_OFF_DELAY || buttonPressed) {
+          red = 255;
+          green = 191;
+        } else if (timeOutCounter == FLASH_OFF_DELAY + FLASH_ON_DELAY) {
+          red = green = 0;
+          timeOutCounter = 0;
+        }
         if (forward && ++position > MENU_ITEMS_COUNT)
           position = 1;
         else if (backward && --position < 1)
@@ -1718,33 +1735,33 @@ void setup() {
             RefreshSetupScreen();
             display->DisplayText("Exit",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
-                                 (MENU_HEIGHT / 2) + 4, 255, 191, 0);
+                                 (MENU_HEIGHT / 2) + 4, red, green, 0);
             break;
           }
           case 2: {  // Brightness
             RefreshSetupScreen();
-            DisplayLum(255, 191, 0);
+            DisplayLum(red, green, 0);
             break;
           }
           case 3: {  // USB Package Size
             RefreshSetupScreen();
             display->DisplayText("USB Packet Size:", 7 * (TOTAL_WIDTH / 128),
-                                 (TOTAL_HEIGHT / 2) + 4, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) + 4, red, green, 0);
             break;
           }
 #ifdef DMDREADER
           case 4: {  // Color
             RefreshSetupScreen();
             display->DisplayText("Color:", 7 * (TOTAL_WIDTH / 128),
-                                 (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 255,
-                                 191, 0);
+                                 (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, red,
+                                 green, 0);
             break;
           }
 #else
           case 4: {  // UDP Delay
             RefreshSetupScreen();
             display->DisplayText("UDP Delay:", 7 * (TOTAL_WIDTH / 128),
-                                 TOTAL_HEIGHT / 2 + 4, 255, 191, 0);
+                                 TOTAL_HEIGHT / 2 + 4, red, green, 0);
             break;
           }
 #endif
@@ -1752,18 +1769,18 @@ void setup() {
             RefreshSetupScreen();
             display->DisplayText(transport->getTypeString(),
                                  7 * (TOTAL_WIDTH / 128),
-                                 (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) - 3, red, green, 0);
             break;
           }
           case 6: {  // Debug
             RefreshSetupScreen();
             display->DisplayText("Debug:", 7 * (TOTAL_WIDTH / 128),
-                                 (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) - 10, red, green, 0);
             break;
           }
           case 7: {  // RGB order
             RefreshSetupScreen();
-            DisplayRGB(255, 191, 0);
+            DisplayRGB(red, green, 0);
             break;
           }
           case 8: {  // LED Test
@@ -1771,11 +1788,11 @@ void setup() {
 #ifdef ZEDMD_DEX16
             display->DisplayText("LED",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
-                                 (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) - 3, red, green, 0);
 #else
             display->DisplayText("LED Test",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
-                                 (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) - 3, red, green, 0);
 #endif
             break;
           }
@@ -1784,11 +1801,13 @@ void setup() {
             RefreshSetupScreen();
             display->DisplayText("Y-Offset",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
-                                 (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
+                                 (TOTAL_HEIGHT / 2) - 10, red, green, 0);
             break;
           }
 #endif
         }
+        display->Render();
+        flashPosition = false;
       }
 
       upButton->update();
@@ -1968,7 +1987,23 @@ void setup() {
       }
       if (buttonPressed || firstMenuRendering) {
         firstMenuRendering = false;
+        flashBaseDelay = false;
+        flashPosition = true; // clear a possible flashing state
+        timeOutCounter = 0;
+        red = 255;
+        green = 191;
         display->Render();
+      }
+
+      timeOutCounter++;
+      if (timeOutCounter == FLASH_BASE_DELAY) {
+        flashBaseDelay = true;
+        timeOutCounter = FLASH_ON_DELAY + FLASH_OFF_DELAY;
+      }
+      if ((timeOutCounter == FLASH_OFF_DELAY ||
+                  timeOutCounter == FLASH_OFF_DELAY + FLASH_ON_DELAY) &&
+                  flashBaseDelay) {
+        flashPosition = true;
       }
       delay(1);
     }
