@@ -61,7 +61,7 @@
 #define LED_CHECK_DELAY 1000  // ms per color
 
 // settings menu flashing text
-#define FLASH_BASE_DELAY 2250  // duration in ms until flashing begins
+#define FLASH_BASE_DELAY 2200  // duration in ms until flashing begins
 #define FLASH_ON_DELAY 750     // on duration in ms when flashing
 #define FLASH_OFF_DELAY 200    // off duration in ms when flashing
 
@@ -123,21 +123,21 @@ uint8_t loopbackColor = (uint8_t)Color::DMD_ORANGE;
 const char *ColorString(uint8_t color) {
   switch ((Color)color) {
     case Color::DMD_ORANGE:
-      return "orange";
+      return "ORANGE";
     case Color::DMD_RED:
-      return "red   ";
+      return "RED   ";
     case Color::DMD_YELLOW:
-      return "yellow";
+      return "YELLOW";
     case Color::DMD_GREEN:
-      return "green ";
+      return "GREEN ";
     case Color::DMD_BLUE:
-      return "blue  ";
+      return "BLUE  ";
     case Color::DMD_PURPLE:
-      return "purple";
+      return "PURPLE";
     case Color::DMD_PINK:
-      return "pink  ";
+      return "PINK  ";
     case Color::DMD_WHITE:
-      return "white ";
+      return "WHITE ";
     default:
       return nullptr;
   }
@@ -222,7 +222,7 @@ void DoRestart(int sec) {
     transport->deinit();
   }
   display->ClearScreen();
-  display->DisplayText("Restarting ...", 0, MENU_Y_OFFSET, 255, 0, 0);
+  display->DisplayText("RESTARTING ...", 0, MENU_Y_OFFSET, 255, 0, 0);
   display->Render();
 #ifndef DMDREADER
   vTaskDelay(pdMS_TO_TICKS(sec * 1000));
@@ -293,25 +293,26 @@ void DisplayVersion(bool logo = false) {
 void DisplayLum(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
   display->DisplayText(" ", (TOTAL_WIDTH / 2) - 26 - 1,
                        MENU_HEIGHT - 6 + MENU_Y_OFFSET, r, g, b);
-  display->DisplayText("Brightness:", (TOTAL_WIDTH / 2) - 26,
-                       MENU_HEIGHT - 6 + MENU_Y_OFFSET, r, g, b);
+  display->DisplayText("BRIGHTNESS:", (TOTAL_WIDTH / 2) - 26,
+                       MENU_HEIGHT - 5 + MENU_Y_OFFSET, r, g, b);
   DisplayNumber(brightness, 2, (TOTAL_WIDTH / 2) + 18,
-                MENU_HEIGHT - 6 + MENU_Y_OFFSET, 255, 191, 0);
+                MENU_HEIGHT - 5 + MENU_Y_OFFSET, 255, 191, 0);
 }
 
 void DisplayRGB(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
 #ifndef DISPLAY_RM67162_AMOLED
-  display->DisplayText("red", 0, MENU_Y_OFFSET, 0, 0, 0, true, true);
+  display->DisplayText("RED", 0, MENU_Y_OFFSET, 0, 0, 0, true, true);
   for (uint8_t i = 0; i < 6; i++) {
     display->DrawPixel(TOTAL_WIDTH - (4 * 4) - 1, i + MENU_Y_OFFSET, 0, 0, 0);
     display->DrawPixel((TOTAL_WIDTH / 2) - (6 * 4) - 1, i + MENU_Y_OFFSET, 0, 0,
                        0);
+    display->DrawPixel(i, MENU_HEIGHT - 6 + MENU_Y_OFFSET, 0, 0, 0);
   }
-  display->DisplayText("blue", TOTAL_WIDTH - (4 * 4), MENU_Y_OFFSET, 0, 0, 0,
+  display->DisplayText("BLUE", TOTAL_WIDTH - (4 * 4), MENU_Y_OFFSET, 0, 0, 0,
                        true, true);
-  display->DisplayText("green", 0, MENU_HEIGHT - 6 + MENU_Y_OFFSET, 0, 0, 0,
+  display->DisplayText("GREEN", 0, MENU_HEIGHT - 5 + MENU_Y_OFFSET, 0, 0, 0,
                        true, true);
-  display->DisplayText("RGB Order:", (TOTAL_WIDTH / 2) - (6 * 4), MENU_Y_OFFSET,
+  display->DisplayText("RGB ORDER:", (TOTAL_WIDTH / 2) - (6 * 4), MENU_Y_OFFSET,
                        r, g, b);
   DisplayNumber(rgbMode, 2, (TOTAL_WIDTH / 2) + (4 * 4), MENU_Y_OFFSET, 255,
                 191, 0);
@@ -777,7 +778,7 @@ void DisplayLogo() {
   }
 
   if (!f) {
-    display->DisplayText("Logo is missing", 0, MENU_Y_OFFSET, 255, 0, 0);
+    display->DisplayText("LOGO IS MISSING", 0, MENU_Y_OFFSET, 255, 0, 0);
     return;
   }
 #ifndef DISPLAY_RM67162_AMOLED
@@ -832,7 +833,7 @@ void DisplayFrame() {
   }
 
   if (!f) {
-    display->DisplayText("Frame is missing", 0, MENU_Y_OFFSET, 255, 0, 0);
+    display->DisplayText("FRAME IS MISSING", 0, MENU_Y_OFFSET, 255, 0, 0);
     return;
   }
 #ifndef DISPLAY_RM67162_AMOLED
@@ -887,20 +888,20 @@ void RefreshSetupScreen() {
                        (TOTAL_HEIGHT / 2) - 3, 128, 128, 128);
 #endif
 #ifndef DMDREADER
-  display->DisplayText("Debug:", 7 * (TOTAL_WIDTH / 128),
+  display->DisplayText("DEBUG:", 7 * (TOTAL_WIDTH / 128),
                        (TOTAL_HEIGHT / 2) - 10, 128, 128, 128);
   DisplayNumber(debug, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
                 (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
 #endif
   if (transport->isUsb()) {
-    display->DisplayText("USB Packet Size:", 7 * (TOTAL_WIDTH / 128),
+    display->DisplayText("USB PACKET SIZE:", 7 * (TOTAL_WIDTH / 128),
                          (TOTAL_HEIGHT / 2) + 4, 128, 128, 128);
     DisplayNumber(usbPackageSizeMultiplier * 32, 4,
                   7 * (TOTAL_WIDTH / 128) + (16 * 4), (TOTAL_HEIGHT / 2) + 4,
                   255, 191, 0);
   } else if (transport->isWifi() &&
              transport->getType() == Transport::WIFI_UDP) {
-    display->DisplayText("UDP Delay:          ", 7 * (TOTAL_WIDTH / 128),
+    display->DisplayText("UDP DELAY:          ", 7 * (TOTAL_WIDTH / 128),
                          (TOTAL_HEIGHT / 2) + 4, 128, 128, 128);
     DisplayNumber(transport->getDelay(), 1, 7 * (TOTAL_WIDTH / 128) + (10 * 4),
                   (TOTAL_HEIGHT / 2) + 4, 255, 191, 0);
@@ -911,7 +912,7 @@ void RefreshSetupScreen() {
   }
 #ifdef DMDREADER
   else if (transport->isSpi()) {
-    display->DisplayText("Color:", 7 * (TOTAL_WIDTH / 128),
+    display->DisplayText("COLOR:", 7 * (TOTAL_WIDTH / 128),
                          (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 128, 128, 128);
     display->DisplayText(ColorString(loopbackColor),
                          7 * (TOTAL_WIDTH / 128) + (6 * 4),
@@ -919,17 +920,17 @@ void RefreshSetupScreen() {
   }
 #endif
 #ifdef ZEDMD_HD_HALF
-  display->DisplayText("Y-Offset", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
+  display->DisplayText("Y-OFFSET", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                        (TOTAL_HEIGHT / 2) - 10, 128, 128, 128);
 #endif
 #ifdef ZEDMD_DEX16
   display->DisplayText("LED", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                        (TOTAL_HEIGHT / 2) - 3, 128, 128, 128);
 #else
-  display->DisplayText("LED Test", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
+  display->DisplayText("LED TEST", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                        (TOTAL_HEIGHT / 2) - 3, 128, 128, 128);
 #endif
-  display->DisplayText("Exit", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
+  display->DisplayText("EXIT", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
                        (MENU_HEIGHT / 2) + 4, 128, 128, 128);
 }
 
@@ -978,7 +979,7 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
 #endif
         if (payloadSize > BUFFER_SIZE) {
           if (debug) {
-            display->DisplayText("Error, payloadSize > BUFFER_SIZE", 0, 0, 255,
+            display->DisplayText("ERROR, payloadSize > BUFFER_SIZE", 0, 0, 255,
                                  0, 0);
             DisplayNumber(payloadSize, 5, 0, 19, 255, 0, 0);
             DisplayNumber(BUFFER_SIZE, 5, 0, 25, 255, 0, 0);
@@ -991,11 +992,11 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
         }
 
         if (debug) {
-          display->DisplayText("Command:", 7 * (TOTAL_WIDTH / 128),
+          display->DisplayText("COMMAND:", 7 * (TOTAL_WIDTH / 128),
                                (TOTAL_HEIGHT / 2) - 10, 128, 128, 128);
           DisplayNumber(command, 2, 7 * (TOTAL_WIDTH / 128) + (8 * 4),
                         (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
-          display->DisplayText("Payload:", 7 * (TOTAL_WIDTH / 128),
+          display->DisplayText("PAYLOAD:", 7 * (TOTAL_WIDTH / 128),
                                (TOTAL_HEIGHT / 2) - 4, 128, 128, 128);
           DisplayNumber(payloadSize, 2, 7 * (TOTAL_WIDTH / 128) + (8 * 4),
                         (TOTAL_HEIGHT / 2) - 4, 255, 191, 0);
@@ -1241,7 +1242,7 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
               Serial.write(CtrlChars, N_ACK_CHARS);
               Serial.flush();
             }
-            display->DisplayText("Saving settings ...", MENU_Y_OFFSET, 0, 255,
+            display->DisplayText("SAVING SETTINGS ...", MENU_Y_OFFSET, 0, 255,
                                  0, 0);
             display->Render();
             SaveLum();
@@ -1259,7 +1260,7 @@ uint8_t HandleData(uint8_t *pData, size_t len) {
 #ifdef ZEDMD_HD_HALF
             SaveYOffset();
 #endif
-            display->DisplayText("Saving settings ... done", MENU_Y_OFFSET, 0,
+            display->DisplayText("SAVING SETTINGS ... DONE", MENU_Y_OFFSET, 0,
                                  255, 0, 0);
             display->Render();
             headerBytesReceived = 0;
@@ -1585,9 +1586,9 @@ void setup() {
   display->SetBrightness(brightness);
 
   if (!fileSystemOK) {
-    display->DisplayText("Error reading file system!", 0, MENU_Y_OFFSET, 255, 0,
+    display->DisplayText("ERROR READING FILE SYSTEM!", 0, MENU_Y_OFFSET, 255, 0,
                          0);
-    display->DisplayText("Try to flash the firmware again.", 0,
+    display->DisplayText("TRY TO FLASH THE FIRMWARE AGAIN.", 0,
                          MENU_Y_OFFSET + 6, 255, 0, 0);
     display->Render();
     while (true);
@@ -1599,13 +1600,13 @@ void setup() {
     case ESP_RST_TASK_WDT:
     case ESP_RST_WDT:
     case ESP_RST_CPU_LOCKUP: {
-      display->DisplayText("An unrecoverable error happend!", 0, 0, 255, 0, 0);
-      display->DisplayText("Coredump has been written. See", 0, 6, 255, 0, 0);
-      display->DisplayText("ppuc.org/ZeDMD how to download", 0, 12, 255, 0, 0);
-      display->DisplayText("it. Error code: ", 0, 18, 255, 0, 0);
+      display->DisplayText("AN UNRECOVERABLE ERROR OCCURED!", 0, 0, 255, 0, 0);
+      display->DisplayText("COREDUMP HAS BEEN WRITTEN. SEE", 0, 6, 255, 0, 0);
+      display->DisplayText("PPUC.ORG/ZEDMD HOW TO DOWNLOAD", 0, 12, 255, 0, 0);
+      display->DisplayText("IT. ERROR CODE: ", 0, 18, 255, 0, 0);
       DisplayNumber(esp_reset_reason(), 2, 16 * 4, 18, 255, 0, 0);
       if (debug) {
-        display->DisplayText("Reboot in 30 seconds ...", 0, 24, 255, 0, 0);
+        display->DisplayText("REBOOT IN 30 SECONDS ...", 0, 24, 255, 0, 0);
         display->Render();
         for (uint8_t i = 29; i > 0; i--) {
           delay(1000);
@@ -1618,10 +1619,10 @@ void setup() {
     }
 
     case ESP_RST_PWR_GLITCH: {
-      display->DisplayText("A power glitch caused a restart!", 0, 0, 255, 0, 0);
-      display->DisplayText("Check your power supply and", 0, 6, 255, 0, 0);
-      display->DisplayText("hardware.", 0, 12, 255, 0, 0);
-      display->DisplayText("Reboot in 30 seconds ...", 0, 24, 255, 0, 0);
+      display->DisplayText("A POWER GLITCH CAUSED A RESTART!", 0, 0, 255, 0, 0);
+      display->DisplayText("CHECK YOUR POWER SUPPLY AND", 0, 6, 255, 0, 0);
+      display->DisplayText("HARDWARE.", 0, 12, 255, 0, 0);
+      display->DisplayText("REBOOT IN 30 SECONDS ...", 0, 24, 255, 0, 0);
       display->Render();
       for (uint8_t i = 29; i > 0; i--) {
         delay(1000);
@@ -1644,7 +1645,7 @@ void setup() {
     renderBuffer[i] = (uint8_t *)malloc(TOTAL_BYTES);
 #endif
     if (nullptr == renderBuffer[i]) {
-      display->DisplayText("out of memory", 0, 0, 255, 0, 0);
+      display->DisplayText("OUT OF MEMORY", 0, 0, 255, 0, 0);
       display->Render();
       while (1);
     }
@@ -1661,7 +1662,7 @@ void setup() {
     SaveSettingsMenu();
 
     RefreshSetupScreen();
-    display->DisplayText("Exit", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
+    display->DisplayText("EXIT", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
                          (MENU_HEIGHT / 2) + 4, 255, 191, 0);
 
     const auto forwardButton = new Bounce2::Button();
@@ -1733,7 +1734,7 @@ void setup() {
         switch (position) {
           case 1: {  // Exit
             RefreshSetupScreen();
-            display->DisplayText("Exit",
+            display->DisplayText("EXIT",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 15,
                                  (MENU_HEIGHT / 2) + 4, red, green, 0);
             break;
@@ -1745,14 +1746,14 @@ void setup() {
           }
           case 3: {  // USB Package Size
             RefreshSetupScreen();
-            display->DisplayText("USB Packet Size:", 7 * (TOTAL_WIDTH / 128),
+            display->DisplayText("USB PACKET SIZE:", 7 * (TOTAL_WIDTH / 128),
                                  (TOTAL_HEIGHT / 2) + 4, red, green, 0);
             break;
           }
 #ifdef DMDREADER
           case 4: {  // Color
             RefreshSetupScreen();
-            display->DisplayText("Color:", 7 * (TOTAL_WIDTH / 128),
+            display->DisplayText("COLOR:", 7 * (TOTAL_WIDTH / 128),
                                  (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, red,
                                  green, 0);
             break;
@@ -1760,7 +1761,7 @@ void setup() {
 #else
           case 4: {  // UDP Delay
             RefreshSetupScreen();
-            display->DisplayText("UDP Delay:", 7 * (TOTAL_WIDTH / 128),
+            display->DisplayText("UDP DELAY:", 7 * (TOTAL_WIDTH / 128),
                                  TOTAL_HEIGHT / 2 + 4, red, green, 0);
             break;
           }
@@ -1774,7 +1775,7 @@ void setup() {
           }
           case 6: {  // Debug
             RefreshSetupScreen();
-            display->DisplayText("Debug:", 7 * (TOTAL_WIDTH / 128),
+            display->DisplayText("DEBUG:", 7 * (TOTAL_WIDTH / 128),
                                  (TOTAL_HEIGHT / 2) - 10, red, green, 0);
             break;
           }
@@ -1790,7 +1791,7 @@ void setup() {
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                                  (TOTAL_HEIGHT / 2) - 3, red, green, 0);
 #else
-            display->DisplayText("LED Test",
+            display->DisplayText("LED TEST",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                                  (TOTAL_HEIGHT / 2) - 3, red, green, 0);
 #endif
@@ -1799,7 +1800,7 @@ void setup() {
 #ifdef ZEDMD_HD_HALF
           case 9: {  // Y Offset
             RefreshSetupScreen();
-            display->DisplayText("Y-Offset",
+            display->DisplayText("Y-OFFSET",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                                  (TOTAL_HEIGHT / 2) - 10, red, green, 0);
             break;
@@ -1949,7 +1950,7 @@ void setup() {
                     (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
 #else
                 display->DisplayText(
-                    "LED Test", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
+                    "LED TEST", TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                     (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
 #endif
                 break;
@@ -1976,7 +1977,7 @@ void setup() {
               yOffset = 32;
             ClearScreen();
             RefreshSetupScreen();
-            display->DisplayText("Y-Offset",
+            display->DisplayText("Y-OFFSET",
                                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 31,
                                  (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
             SaveYOffset();
@@ -2034,7 +2035,7 @@ void setup() {
     buffers[i] = (uint8_t *)malloc(BUFFER_SIZE);
 #endif
     if (nullptr == buffers[i]) {
-      display->DisplayText("out of memory", 0, MENU_Y_OFFSET, 255, 0, 0);
+      display->DisplayText("OUT OF MEMORY", 0, MENU_Y_OFFSET, 255, 0, 0);
       display->Render();
       while (1);
     }
