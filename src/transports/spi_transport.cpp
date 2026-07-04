@@ -81,10 +81,10 @@ bool SpiTransport::initDmdReader() {
     return true;
   }
 
-  m_dmdReaderInitialized = dmdreader_init(true);
+  m_dmdReaderInitialized = dmdreader_init();
   if (m_dmdReaderInitialized) {
     // Start SPI transfer, waiting in the background.
-    dmdreader_spi_init();
+    //dmdreader_spi_init();
   }
 
   return m_dmdReaderInitialized;

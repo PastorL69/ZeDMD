@@ -2279,13 +2279,13 @@ void loop1() {
     const uint32_t now = millis();
 
     if (lastDmdReaderInitAttempt == 0 ||
-               now - lastDmdReaderInitAttempt >= RETRIGGER_DELAY) {
+               now - lastDmdReaderInitAttempt >= 750) {
       spiTransport->initDmdReader();
       lastDmdReaderInitAttempt = now;
       countDmdReaderSignals = true;
 
     } else if (countDmdReaderSignals &&
-               now - lastDmdReaderInitAttempt >= COUNT_CLOCK_DELAY) {
+               now - lastDmdReaderInitAttempt >= 250) {
       spiTransport->initDmdReader();
       lastDmdReaderInitAttempt = now;
       countDmdReaderSignals = false;
@@ -2293,7 +2293,7 @@ void loop1() {
     return;
 
   } else if (!transport->isLoopback()) {
-    dmdreader_spi_send();
+    //dmdreader_spi_send();
     tight_loop_contents();
 
   } else {
