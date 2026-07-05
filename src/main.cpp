@@ -1604,7 +1604,7 @@ void setup() {
     case ESP_RST_CPU_LOCKUP: {
       display->DisplayText("AN UNRECOVERABLE ERROR OCCURED!", 0, 0, 255, 0, 0);
       display->DisplayText("COREDUMP HAS BEEN WRITTEN. SEE", 0, 6, 255, 0, 0);
-      display->DisplayText("PPUC.ORG/ZEDMD HOW TO DOWNLOAD", 0, 12, 255, 0, 0);
+      display->DisplayText("ppuc.org/ZeDMD HOW TO DOWNLOAD", 0, 12, 255, 0, 0);
       display->DisplayText("IT. ERROR CODE: ", 0, 18, 255, 0, 0);
       DisplayNumber(esp_reset_reason(), 2, 16 * 4, 18, 255, 0, 0);
       if (debug) {
