@@ -5,6 +5,7 @@
 #define PANEL_WIDTH 128  // Width: number of LEDs for 1 panel.
 #define PANEL_HEIGHT 64  // Height: number of LEDs.
 #define PANELS_NUMBER 2  // Number of horizontally chained panels.
+#define MENU_SETTING_OFFSET 11
 #elif defined(ZEDMD_HD_HALF)
 #define PANEL_WIDTH 128  // Width: number of LEDs for 1 panel.
 #define PANEL_HEIGHT 64  // Height: number of LEDs.
@@ -13,6 +14,7 @@
 #define PANEL_WIDTH 64   // Width: number of LEDs for 1 panel.
 #define PANEL_HEIGHT 64  // Height: number of LEDs.
 #define PANELS_NUMBER 3  // Number of horizontally chained panels.
+#define MENU_SETTING_OFFSET 7
 #endif
 #ifndef PANEL_WIDTH
 #define PANEL_WIDTH 64   // Width: number of LEDs for 1 panel.
@@ -41,6 +43,9 @@
 #endif
 #ifndef MAX_BRIGHTNESS
 #define MAX_BRIGHTNESS 15
+#endif
+#ifndef MENU_SETTING_OFFSET
+#define MENU_SETTING_OFFSET 0
 #endif
 #define TOTAL_BYTES (TOTAL_WIDTH * TOTAL_HEIGHT * 3)
 #define RGB565_TOTAL_BYTES (TOTAL_WIDTH * TOTAL_HEIGHT * 2)

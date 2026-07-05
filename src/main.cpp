@@ -292,11 +292,11 @@ void DisplayVersion(bool logo = false) {
 
 void DisplayLum(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
   display->DisplayText(" ", (TOTAL_WIDTH / 2) - 26 - 1,
-                       MENU_HEIGHT - 6 + MENU_Y_OFFSET, r, g, b);
+                       MENU_HEIGHT - 6 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, r, g, b);
   display->DisplayText("BRIGHTNESS:", (TOTAL_WIDTH / 2) - 26,
-                       MENU_HEIGHT - 5 + MENU_Y_OFFSET, r, g, b);
+                       MENU_HEIGHT - 5 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, r, g, b);
   DisplayNumber(brightness, 2, (TOTAL_WIDTH / 2) + 18,
-                MENU_HEIGHT - 5 + MENU_Y_OFFSET, 255, 191, 0);
+                MENU_HEIGHT - 5 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, 255, 191, 0);
 }
 
 void DisplayRGB(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
@@ -304,17 +304,19 @@ void DisplayRGB(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
   display->DisplayText("RED", 0, MENU_Y_OFFSET, 0, 0, 0, true, true);
   for (uint8_t i = 0; i < 6; i++) {
     display->DrawPixel(TOTAL_WIDTH - (4 * 4) - 1, i + MENU_Y_OFFSET, 0, 0, 0);
+#if !(defined(ZEDMD_HD) || defined(ZEDMD_SEGAHD))
     display->DrawPixel((TOTAL_WIDTH / 2) - (6 * 4) - 1, i + MENU_Y_OFFSET, 0, 0,
                        0);
+#endif
     display->DrawPixel(i, MENU_HEIGHT - 6 + MENU_Y_OFFSET, 0, 0, 0);
   }
   display->DisplayText("BLUE", TOTAL_WIDTH - (4 * 4), MENU_Y_OFFSET, 0, 0, 0,
                        true, true);
   display->DisplayText("GREEN", 0, MENU_HEIGHT - 5 + MENU_Y_OFFSET, 0, 0, 0,
                        true, true);
-  display->DisplayText("RGB ORDER:", (TOTAL_WIDTH / 2) - (6 * 4), MENU_Y_OFFSET,
+  display->DisplayText("RGB ORDER:", (TOTAL_WIDTH / 2) - (6 * 4), MENU_Y_OFFSET + MENU_SETTING_OFFSET,
                        r, g, b);
-  DisplayNumber(rgbMode, 2, (TOTAL_WIDTH / 2) + (4 * 4), MENU_Y_OFFSET, 255,
+  DisplayNumber(rgbMode, 2, (TOTAL_WIDTH / 2) + (4 * 4), MENU_Y_OFFSET + MENU_SETTING_OFFSET, 255,
                 191, 0);
 #endif
 }
@@ -1919,6 +1921,9 @@ void setup() {
           case 7: {  // RGB order
             if (rgbModeLoaded != 0 || rgbModeLoaded == 6) {
               rgbMode = 0;
+              settingsMenu = true;
+              ClearScreen();
+              SaveSettingsMenu();
               SaveRgbOrder();
               delay(10);
               Restart();
