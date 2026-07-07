@@ -667,7 +667,7 @@ void AcquireNextBuffer() {
 void CheckMenuButton() {
 #ifndef DISPLAY_RM67162_AMOLED
 
-#ifdef BACKWARD_BUTTON_PIN
+#if defined(BACKWARD_BUTTON_PIN) && defined(PICO_BUILD)
   if (!digitalRead(FORWARD_BUTTON_PIN) || 
       !digitalRead(BACKWARD_BUTTON_PIN)) {
 #else
