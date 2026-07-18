@@ -9,6 +9,8 @@
 #define SYS_CLK_MHZ 266
 #endif
 
+#include <WS2812FX.h>
+
 #include <Arduino.h>
 #include <Bounce2.h>
 
@@ -2266,6 +2268,7 @@ void setup1() {
   }
 
   // not required, but slightly extend the splash screen duration
+  leds_init();
   delay(425);
   core_1_initialized = true;
 }
@@ -2274,6 +2277,11 @@ void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
   static uint32_t lastDmdReaderInitAttempt = 0;
   static bool countDmdReaderSignals = false;
+
+  static uint32_t lastAttempt = 0;
+  const uint32_t now = millis();
+
+  service_leds();
 
   if (!spiTransport->isDmdReaderInitialized()) {
     const uint32_t now = millis();
