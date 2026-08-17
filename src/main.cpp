@@ -2334,7 +2334,7 @@ void loop1() {
     return;
 
   } else if (!transport->isLoopback()) {
-    dmdreader_spi_send();
+    dmdreader_spi_send(!spiTransport->isActive());
     tight_loop_contents();
 
   } else {
