@@ -76,6 +76,7 @@ const uint8_t CtrlChars[6]
 uint8_t numCtrlCharsFound = 0;
 
 DisplayDriver *display;
+Transport *transport = nullptr;
 
 // Buffers for storing data
 uint8_t *buffers[NUM_BUFFERS];
@@ -170,6 +171,50 @@ static void Scale2xLoopback(const uint8_t *src, uint8_t *dst, uint16_t srcWidth,
     }
   }
 }
+
+// Display DMDreader signal values and the SPI connection state with the Pi
+static void DisplayPpucDmdDebug() {
+  uint64_t detected_signals = dmdreader_get_detected_signals();
+  uint32_t dotclk = detected_signals >> 32;
+  uint16_t rclk = detected_signals >> 16;  // never exceeds 25000
+  uint16_t rdata = detected_signals;       // never exceeds 600
+
+  // loopback is enabled by default. if it is inactive -> Pi available.
+  bool connectionEstablished = !transport->isLoopback();
+
+  ClearScreen();        
+  display->DisplayText("AUTO DEBUG", (TOTAL_WIDTH / 2) - (5 * 4),
+                       MENU_Y_OFFSET + MENU_SETTING_OFFSET, 128, 128, 128);
+
+  display->DisplayText("DOCLK:", 7 * (TOTAL_WIDTH / 128),
+                       (TOTAL_HEIGHT / 2) - 10, 128, 128, 128);
+  DisplayNumber(dotclk, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
+                (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
+
+  display->DisplayText("ROCLK:", 7 * (TOTAL_WIDTH / 128),
+                       (TOTAL_HEIGHT / 2) - 3, 128, 128, 128);
+  DisplayNumber(rclk, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
+                (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
+
+  display->DisplayText("RDATA:", 7 * (TOTAL_WIDTH / 128),
+                        (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 128, 128, 128);
+  DisplayNumber(rdata, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
+                (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 255, 191, 0);
+
+  display->DisplayText("PI DETECTED: ",
+                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 51,
+                  (MENU_HEIGHT / 2) + 4, 128, 128, 128);
+  if (connectionEstablished) {
+    display->DisplayText("Y",
+                TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 3,
+                (MENU_HEIGHT / 2) + 4, 0, 128, 0);
+  } else {
+    display->DisplayText("N",
+                TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 3,
+                (MENU_HEIGHT / 2) + 4, 128, 0, 0);
+  }
+  display->Render();
+}
 #endif
 
 // We needed to change these from RGB to RC (Red Color), BC, GC to prevent
@@ -201,8 +246,6 @@ uint8_t usbPackageSizeMultiplier = USB_PACKAGE_SIZE / 32;
 uint8_t settingsMenu = 0;
 uint8_t debug = 0;
 uint8_t ledTest = 0;
-
-Transport *transport = nullptr;
 
 bool logoActive, saverActive;
 bool transportActive;
@@ -2313,10 +2356,11 @@ void setup1() {
 
 void loop1() {
   auto *spiTransport = static_cast<SpiTransport *>(transport);
-  static uint32_t lastDmdReaderInitAttempt = 0;
-  static bool countDmdReaderSignals = false;
 
   if (!spiTransport->isDmdReaderInitialized()) {
+    static bool countDmdReaderSignals = false;
+    static uint8_t dmdReaderRetryCount = 0;
+    static uint32_t lastDmdReaderInitAttempt = 0;
     const uint32_t now = millis();
 
     if (lastDmdReaderInitAttempt == 0 ||
@@ -2330,6 +2374,10 @@ void loop1() {
       spiTransport->initDmdReader();
       lastDmdReaderInitAttempt = now;
       countDmdReaderSignals = false;
+      dmdReaderRetryCount++;
+      if (dmdReaderRetryCount >= 5) {
+        DisplayPpucDmdDebug();
+      }
     }
     return;
 
