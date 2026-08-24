@@ -1986,8 +1986,8 @@ void setup() {
               ledTest = 0;
             else if (down &&
                      --ledTest >
-                         3)  // underflow will result in 255, set it to 2
-              ledTest = 3;
+                         4)  // underflow will result in 255, set it to 2
+              ledTest = 4;
             switch (ledTest) {
               case 0:
                 ClearScreen();
@@ -2012,6 +2012,10 @@ void setup() {
                 break;
               case 3:
                 display->FillScreen(0, 0, 255);
+                display->Render();
+                break;
+              case 4:
+                display->FillScreen(255, 255, 255);
                 display->Render();
                 break;
             }
