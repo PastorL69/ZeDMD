@@ -1982,11 +1982,11 @@ void setup() {
             break;
           }
           case 8: {  // LED Test
-            if (up && ++ledTest > 3)
+            if (up && ++ledTest > 4)
               ledTest = 0;
             else if (down &&
                      --ledTest >
-                         4)  // underflow will result in 255, set it to 2
+                         4)  // underflow will result in 255, set it to 4
               ledTest = 4;
             switch (ledTest) {
               case 0:
