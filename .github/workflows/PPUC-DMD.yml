@@ -68,15 +68,29 @@ jobs:
           pio run -e ${{ matrix.panels }} -t buildunified 2>&1 | tee build.log
           BUILD_DIR=.pio/build/${{ matrix.panels }}
 
-          OFFSET_BIN=$(( $(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
-          cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
-          truncate -s $OFFSET_BIN $BUILD_DIR/firmware_with_fs.bin
-          cat $BUILD_DIR/littlefs.bin >> $BUILD_DIR/firmware_with_fs.bin
+          # Extract raw offset string (e.g., 0x101bf000)
+          FS_OFFSET=$(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1)
 
+          # Merge code .bin (at 0x10000000) and LittleFS .bin (at $FS_OFFSET) into a single sparse HEX file
+          python3 -c "
+          from intelhex import IntelHex
+          ih = IntelHex()
+          ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
+          ih.loadbin('$BUILD_DIR/littlefs.bin', offset=int('$FS_OFFSET', 16))
+          ih.tofile('firmware.hex', format='hex')
+          "
+
+          # Create unpadded update-only HEX file
+          python3 -c "
+          from intelhex import IntelHex
+          ih = IntelHex()
+          ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
+          ih.tofile('firmware-update.hex', format='hex')
+          "
+
+          # Artifact copies
           cp $BUILD_DIR/firmware_with_fs.uf2 firmware.uf2
           cp $BUILD_DIR/firmware.uf2 firmware-update.uf2
-          cp $BUILD_DIR/firmware_with_fs.bin firmware.bin
-          cp $BUILD_DIR/firmware.bin firmware-update.bin
 
       - uses: actions/upload-artifact@v7
         with:
@@ -84,8 +98,8 @@ jobs:
           path: |
             firmware.uf2
             firmware-update.uf2
-            firmware.bin
-            firmware-update.bin
+            firmware.hex
+            firmware-update.hex
 
   post-build:
     runs-on: ubuntu-latest
@@ -98,28 +112,28 @@ jobs:
         run: |
             cd ../pico2_128x32_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../pico2_256x64_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../pico2_128x64x2_ppucdmd
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../ppucdmd_128x16
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../ppucdmd_128x32
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../ppucdmd_192x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../ppucdmd_256x64
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ../ppucdmd_128x64x2
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
+            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
             cd ..
       - name: Release
         uses: softprops/action-gh-release@v3
