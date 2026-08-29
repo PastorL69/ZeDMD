@@ -91,7 +91,7 @@ jobs:
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
           ih.loadbin('$BUILD_DIR/littlefs.bin', offset=int('$FS_OFFSET', 16))
-          ih.tofile('firmware-${{ matrix.panels }}-${VERSION}.hex', format='hex')
+          ih.tofile('${{ matrix.panels }}-${VERSION}.hex', format='hex')
           "
 
           # Create unpadded update-only HEX file
@@ -99,12 +99,12 @@ jobs:
           from intelhex import IntelHex
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
-          ih.tofile('firmware-update-${{ matrix.panels }}-${VERSION}.hex', format='hex')
+          ih.tofile('update-${{ matrix.panels }}-${VERSION}.hex', format='hex')
           "
 
           # Artifact copies
-          cp $BUILD_DIR/firmware_with_fs.uf2 firmware-${{ matrix.panels }}-${VERSION}.uf2
-          cp $BUILD_DIR/firmware.uf2 firmware-update-${{ matrix.panels }}-${VERSION}.uf2
+          cp $BUILD_DIR/firmware_with_fs.uf2 ${{ matrix.panels }}-${VERSION}.uf2
+          cp $BUILD_DIR/firmware.uf2 update-${{ matrix.panels }}-${VERSION}.uf2
 
       - uses: actions/upload-artifact@v7
         with:
