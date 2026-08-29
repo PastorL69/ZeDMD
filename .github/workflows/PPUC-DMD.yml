@@ -44,14 +44,14 @@ jobs:
       fail-fast: false
       matrix:
         panels:
-          - PPUC-DMD_128x32_ZeDMD
-          - PPUC-DMD_256x64_P2_ZeDMD
-          - PPUC-DMD_256x64_P1875_ZeDMD
-          - PPUC-DMD_128x16
-          - PPUC-DMD_128x32
-          - PPUC-DMD_192x64
-          - PPUC-DMD_256x64_P2
-          - PPUC-DMD_256x64_P1875
+          - ZeDMD_PPUCDMD_128x32
+          - ZeDMD_PPUCDMD_256x64_P2
+          - ZeDMD_PPUCDMD_256x64_P1875
+          - PPUCDMD_128x16
+          - PPUCDMD_128x32
+          - PPUCDMD_192x64
+          - PPUCDMD_256x64_P2
+          - PPUCDMD_256x64_P1875
 
     name: ${{ matrix.panels }}
 
@@ -110,10 +110,10 @@ jobs:
         with:
           name: ${{ matrix.panels }}
           path: |
-            firmware-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
-            firmware-update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
-            firmware-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
-            firmware-update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
+            ${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
+            update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
+            ${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
+            update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
 
   post-build:
     runs-on: ubuntu-latest
@@ -126,14 +126,14 @@ jobs:
         run: |
           VERSION="v${{ needs.version.outputs.tag }}"
 
-          for panel in PPUC-DMD_128x32_ZeDMD PPUC-DMD_256x64_P2_ZeDMD PPUC-DMD_256x64_P1875_ZeDMD PPUC-DMD_128x16 PPUC-DMD_128x32 PPUC-DMD_192x64 PPUC-DMD_256x64_P2 PPUC-DMD_256x64_P1875; do
+          for panel in ZeDMD_PPUCDMD_128x32 ZeDMD_PPUCDMD_256x64_P2 ZeDMD_PPUCDMD_256x64_P1875 PPUCDMD_128x16 PPUCDMD_128x32 PPUCDMD_192x64 PPUCDMD_256x64_P2 PPUCDMD_256x64_P1875; do
             cd "${panel}"
             echo "${{ needs.version.outputs.tag }}" > version.txt
             zip "../${panel}-${VERSION}.zip" \
-              "firmware-${panel}-${VERSION}.uf2" \
-              "firmware-update-${panel}-${VERSION}.uf2" \
-              "firmware-${panel}-${VERSION}.hex" \
-              "firmware-update-${panel}-${VERSION}.hex" \
+              "${panel}-${VERSION}.uf2" \
+              "update-${panel}-${VERSION}.uf2" \
+              "${panel}-${VERSION}.hex" \
+              "update-${panel}-${VERSION}.hex" \
               version.txt
             cd ..
           done
@@ -144,11 +144,11 @@ jobs:
         with:
           draft: true
           files: |
-            PPUC-DMD_128x32_ZeDMD-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_256x64_P2_ZeDMD-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_256x64_P1875_ZeDMD-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_128x16-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_128x32-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_192x64-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_256x64_P2-v${{ needs.version.outputs.tag }}.zip
-            PPUC-DMD_256x64_P1875-v${{ needs.version.outputs.tag }}.zip
+            ZeDMD_PPUCDMD_128x32-v${{ needs.version.outputs.tag }}.zip
+            ZeDMD_PPUCDMD_256x64_P2-v${{ needs.version.outputs.tag }}.zip
+            ZeDMD_PPUCDMD_256x64_P1875-v${{ needs.version.outputs.tag }}.zip
+            PPUCDMD_128x16-v${{ needs.version.outputs.tag }}.zip
+            PPUCDMD_128x32-v${{ needs.version.outputs.tag }}.zip
+            PPUCDMD_192x64-v${{ needs.version.outputs.tag }}.zip
+            PPUCDMD_256x64_P2-v${{ needs.version.outputs.tag }}.zip
+            PPUCDMD_256x64_P1875-v${{ needs.version.outputs.tag }}.zip
