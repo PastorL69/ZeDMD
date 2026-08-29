@@ -44,16 +44,24 @@ jobs:
       fail-fast: false
       matrix:
         panels:
-          - ZeDMD_PPUCDMD_128x32
-          - ZeDMD_PPUCDMD_256x64_P2
-          - ZeDMD_PPUCDMD_256x64_P1875
-          - PPUCDMD_128x16
-          - PPUCDMD_128x32
-          - PPUCDMD_192x64
-          - PPUCDMD_256x64_P2
-          - PPUCDMD_256x64_P1875
+          - env: ZeDMD_PPUCDMD_128x32
+            file_name: 128x32
+          - env: ZeDMD_PPUCDMD_256x64_P2
+            file_name: 256x64_P2
+          - env: ZeDMD_PPUCDMD_256x64_P1875
+            file_name: 256x64_P1875
+          - env: PPUCDMD_128x16
+            file_name: 128x16
+          - env: PPUCDMD_128x32
+            file_name: 128x32
+          - env: PPUCDMD_192x64
+            file_name: 192x64
+          - env: PPUCDMD_256x64_P2
+            file_name: 256x64_P2
+          - env: PPUCDMD_256x64_P1875
+            file_name: 256x64_P1875
 
-    name: ${{ matrix.panels }}
+    name: ${{ matrix.panels.env }}
 
     steps:
       - uses: actions/checkout@v6
@@ -77,10 +85,12 @@ jobs:
       - name: Build firmware
         run: |
           VERSION="v${{ needs.version.outputs.tag }}"
-          pio run -e ${{ matrix.panels }}
-          pio run -e ${{ matrix.panels }} -t buildfs
-          pio run -e ${{ matrix.panels }} -t buildunified 2>&1 | tee build.log
-          BUILD_DIR=.pio/build/${{ matrix.panels }}
+          NAME="${{ matrix.panels.file_name }}"
+          
+          pio run -e ${{ matrix.panels.env }}
+          pio run -e ${{ matrix.panels.env }} -t buildfs
+          pio run -e ${{ matrix.panels.env }} -t buildunified 2>&1 | tee build.log
+          BUILD_DIR=.pio/build/${{ matrix.panels.env }}
 
           # Extract raw offset string (e.g., 0x101bf000)
           FS_OFFSET=$(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1)
@@ -91,7 +101,7 @@ jobs:
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
           ih.loadbin('$BUILD_DIR/littlefs.bin', offset=int('$FS_OFFSET', 16))
-          ih.tofile('${{ matrix.panels }}-${VERSION}.hex', format='hex')
+          ih.tofile('${NAME}_${VERSION}.hex', format='hex')
           "
 
           # Create unpadded update-only HEX file
@@ -99,21 +109,21 @@ jobs:
           from intelhex import IntelHex
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
-          ih.tofile('update_${{ matrix.panels }}_${VERSION}.hex', format='hex')
+          ih.tofile('update_${NAME}_${VERSION}.hex', format='hex')
           "
 
           # Artifact copies
-          cp $BUILD_DIR/firmware_with_fs.uf2 ${{ matrix.panels }}_${VERSION}.uf2
-          cp $BUILD_DIR/firmware.uf2 update_${{ matrix.panels }}_${VERSION}.uf2
+          cp $BUILD_DIR/firmware_with_fs.uf2 "${NAME}_${VERSION}.uf2"
+          cp $BUILD_DIR/firmware.uf2 "update_${NAME}_${VERSION}.uf2"
 
       - uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.panels }}
+          name: ${{ matrix.panels.env }}
           path: |
-            ${{ matrix.panels }}_v${{ needs.version.outputs.tag }}.uf2
-            update_${{ matrix.panels }}_v${{ needs.version.outputs.tag }}.uf2
-            ${{ matrix.panels }}_v${{ needs.version.outputs.tag }}.hex
-            update_${{ matrix.panels }}_v${{ needs.version.outputs.tag }}.hex
+            ${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.uf2
+            update_${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.uf2
+            ${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.hex
+            update_${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.hex
 
   post-build:
     runs-on: ubuntu-latest
@@ -126,16 +136,14 @@ jobs:
         run: |
           VERSION="v${{ needs.version.outputs.tag }}"
 
-          for panel in ZeDMD_PPUCDMD_128x32 ZeDMD_PPUCDMD_256x64_P2 ZeDMD_PPUCDMD_256x64_P1875 PPUCDMD_128x16 PPUCDMD_128x32 PPUCDMD_192x64 PPUCDMD_256x64_P2 PPUCDMD_256x64_P1875; do
-            cd "${panel}"
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip "../${panel}_${VERSION}.zip" \
-              "${panel}_${VERSION}.uf2" \
-              "update_${panel}_${VERSION}.uf2" \
-              "${panel}_${VERSION}.hex" \
-              "update_${panel}_${VERSION}.hex" \
-              version.txt
-            cd ..
+          for dir in */ ; do
+            panel="${dir%/}"
+            if [ -d "${panel}" ]; then
+              cd "${panel}"
+              echo "${{ needs.version.outputs.tag }}" > version.txt
+              zip "../${panel}_${VERSION}.zip" *
+              cd ..
+            fi
           done
 
       - name: Release
@@ -143,12 +151,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
-          files: |
-            ZeDMD_PPUCDMD_128x32_v${{ needs.version.outputs.tag }}.zip
-            ZeDMD_PPUCDMD_256x64_P2_v${{ needs.version.outputs.tag }}.zip
-            ZeDMD_PPUCDMD_256x64_P1875_v${{ needs.version.outputs.tag }}.zip
-            PPUCDMD_128x16_v${{ needs.version.outputs.tag }}.zip
-            PPUCDMD_128x32_v${{ needs.version.outputs.tag }}.zip
-            PPUCDMD_192x64_v${{ needs.version.outputs.tag }}.zip
-            PPUCDMD_256x64_P2_v${{ needs.version.outputs.tag }}.zip
-            PPUCDMD_256x64_P1875_v${{ needs.version.outputs.tag }}.zip
+          files: "*.zip"
