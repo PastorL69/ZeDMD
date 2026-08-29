@@ -5,6 +5,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   version:
     name: Detect version
@@ -37,8 +41,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ version ]
     strategy:
+      fail-fast: false
       matrix:
-        panels: ['pico2_128x32_ppucdmd', 'pico2_256x64_ppucdmd', 'pico2_128x64x2_ppucdmd', 'ppucdmd_128x16', 'ppucdmd_128x32', 'ppucdmd_192x64', 'ppucdmd_256x64', 'ppucdmd_128x64x2']
+        panels:
+          - PPUC-DMD_128x32_ZeDMD
+          - PPUC-DMD_256x64_P2_ZeDMD
+          - PPUC-DMD_256x64_P1875_ZeDMD
+          - PPUC-DMD_128x16
+          - PPUC-DMD_128x32
+          - PPUC-DMD_192x64
+          - PPUC-DMD_256x64_P2
+          - PPUC-DMD_256x64_P1875
 
     name: ${{ matrix.panels }}
 
@@ -63,6 +76,7 @@ jobs:
 
       - name: Build firmware
         run: |
+          VERSION="v${{ needs.version.outputs.tag }}"
           pio run -e ${{ matrix.panels }}
           pio run -e ${{ matrix.panels }} -t buildfs
           pio run -e ${{ matrix.panels }} -t buildunified 2>&1 | tee build.log
@@ -77,7 +91,7 @@ jobs:
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
           ih.loadbin('$BUILD_DIR/littlefs.bin', offset=int('$FS_OFFSET', 16))
-          ih.tofile('firmware.hex', format='hex')
+          ih.tofile('firmware-${{ matrix.panels }}-${VERSION}.hex', format='hex')
           "
 
           # Create unpadded update-only HEX file
@@ -85,21 +99,21 @@ jobs:
           from intelhex import IntelHex
           ih = IntelHex()
           ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
-          ih.tofile('firmware-update.hex', format='hex')
+          ih.tofile('firmware-update-${{ matrix.panels }}-${VERSION}.hex', format='hex')
           "
 
           # Artifact copies
-          cp $BUILD_DIR/firmware_with_fs.uf2 firmware.uf2
-          cp $BUILD_DIR/firmware.uf2 firmware-update.uf2
+          cp $BUILD_DIR/firmware_with_fs.uf2 firmware-${{ matrix.panels }}-${VERSION}.uf2
+          cp $BUILD_DIR/firmware.uf2 firmware-update-${{ matrix.panels }}-${VERSION}.uf2
 
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.panels }}
           path: |
-            firmware.uf2
-            firmware-update.uf2
-            firmware.hex
-            firmware-update.hex
+            firmware-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
+            firmware-update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.uf2
+            firmware-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
+            firmware-update-${{ matrix.panels }}-v${{ needs.version.outputs.tag }}.hex
 
   post-build:
     runs-on: ubuntu-latest
@@ -110,42 +124,31 @@ jobs:
       - name: Package
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-            cd ../pico2_128x32_ppucdmd
+          VERSION="v${{ needs.version.outputs.tag }}"
+
+          for panel in PPUC-DMD_128x32_ZeDMD PPUC-DMD_256x64_P2_ZeDMD PPUC-DMD_256x64_P1875_ZeDMD PPUC-DMD_128x16 PPUC-DMD_128x32 PPUC-DMD_192x64 PPUC-DMD_256x64_P2 PPUC-DMD_256x64_P1875; do
+            cd "${panel}"
             echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../pico2_256x64_ppucdmd
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../pico2_128x64x2_ppucdmd
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../ppucdmd_128x16
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../ppucdmd_128x32
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../ppucdmd_192x64
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../ppucdmd_256x64
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
-            cd ../ppucdmd_128x64x2
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.hex firmware-update.hex version.txt
+            zip "../${panel}-${VERSION}.zip" \
+              "firmware-${panel}-${VERSION}.uf2" \
+              "firmware-update-${panel}-${VERSION}.uf2" \
+              "firmware-${panel}-${VERSION}.hex" \
+              "firmware-update-${panel}-${VERSION}.hex" \
+              version.txt
             cd ..
+          done
+
       - name: Release
         uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
           files: |
-            pico2_128x32_ppucdmd.zip
-            pico2_256x64_ppucdmd.zip
-            pico2_128x64x2_ppucdmd.zip
-            ppucdmd_128x16.zip
-            ppucdmd_128x32.zip
-            ppucdmd_192x64.zip
-            ppucdmd_256x64.zip
-            ppucdmd_128x64x2.zip
+            PPUC-DMD_128x32_ZeDMD-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_256x64_P2_ZeDMD-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_256x64_P1875_ZeDMD-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_128x16-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_128x32-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_192x64-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_256x64_P2-v${{ needs.version.outputs.tag }}.zip
+            PPUC-DMD_256x64_P1875-v${{ needs.version.outputs.tag }}.zip
