@@ -172,7 +172,7 @@ static void Scale2xLoopback(const uint8_t *src, uint8_t *dst, uint16_t srcWidth,
   }
 }
 
-// Display DMDreader signal values and the SPI connection state with the Pi
+// Displays DMDreader signal values and the SPI connection state with the Pi
 static void DisplayPpucDmdDebug() {
   uint64_t detected_signals = dmdreader_get_detected_signals();
   uint32_t dotclk = detected_signals >> 32;
@@ -183,35 +183,41 @@ static void DisplayPpucDmdDebug() {
   bool connectionEstablished = !transport->isLoopback();
 
   ClearScreen();        
-  display->DisplayText("AUTO DEBUG", (TOTAL_WIDTH / 2) - (5 * 4),
+  display->DisplayText("TROUBLESHOOTING", (TOTAL_WIDTH / 2) - (10 * 3),
                        MENU_Y_OFFSET + MENU_SETTING_OFFSET, 128, 128, 128);
 
-  display->DisplayText("DOCLK:", 7 * (TOTAL_WIDTH / 128),
-                       (TOTAL_HEIGHT / 2) - 10, 128, 128, 128);
-  DisplayNumber(dotclk, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
-                (TOTAL_HEIGHT / 2) - 10, 255, 191, 0);
+  if (detected_signals != 0) {
+    display->DisplayText("PLEASE CONTACT SELLER AND", 1 * (TOTAL_WIDTH / 128),
+                        (TOTAL_HEIGHT / 2) - 9, 255, 191, 0);
+    display->DisplayText("SHARE VALUES VISIBLE BELOW", 1 * (TOTAL_WIDTH / 128),
+                        (TOTAL_HEIGHT / 2) - 2, 255, 191, 0);
 
-  display->DisplayText("ROCLK:", 7 * (TOTAL_WIDTH / 128),
-                       (TOTAL_HEIGHT / 2) - 3, 128, 128, 128);
-  DisplayNumber(rclk, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
-                (TOTAL_HEIGHT / 2) - 3, 255, 191, 0);
+    DisplayNumber(dotclk, 1, 1 * (TOTAL_WIDTH / 128),
+                  (TOTAL_HEIGHT / 2) + 5 - MENU_Y_OFFSET, 255, 191, 100);
+    DisplayNumber(rclk, 1, 1 * (TOTAL_WIDTH / 128) + (11 * 4),
+                  (TOTAL_HEIGHT / 2) + 5 - MENU_Y_OFFSET, 255, 191, 100);
+    DisplayNumber(rdata, 1, 1 * (TOTAL_WIDTH / 128) + (17 * 4),
+                  (TOTAL_HEIGHT / 2) + 5 - MENU_Y_OFFSET, 255, 191, 100);
+  } else {
+    display->DisplayText("PLEASE CHECK RIBBON CABLE", 1 * (TOTAL_WIDTH / 128),
+                        (TOTAL_HEIGHT / 2) - 9, 255, 191, 0);
+    display->DisplayText("ORIENTATION AND CONNECTIONS", 1 * (TOTAL_WIDTH / 128),
+                        (TOTAL_HEIGHT / 2) - 2, 255, 191, 0);
+    display->DisplayText("HTTPS://PPUC.ORG/DMDHELP", 1 * (TOTAL_WIDTH / 128),
+                          (TOTAL_HEIGHT / 2) + 5 - MENU_Y_OFFSET, 255, 191, 0);
+  }
 
-  display->DisplayText("RDATA:", 7 * (TOTAL_WIDTH / 128),
-                        (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 128, 128, 128);
-  DisplayNumber(rdata, 1, 7 * (TOTAL_WIDTH / 128) + (6 * 4),
-                (TOTAL_HEIGHT / 2) + 4 - MENU_Y_OFFSET, 255, 191, 0);
-
-  display->DisplayText("PI DETECTED: ",
-                  TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 51,
-                  (MENU_HEIGHT / 2) + 4, 128, 128, 128);
+  display->DisplayText("PI: ",
+                  TOTAL_WIDTH - (2 * (TOTAL_WIDTH / 128)) - 14,
+                  (MENU_HEIGHT / 2) - 9, 128, 128, 128);
   if (connectionEstablished) {
     display->DisplayText("Y",
-                TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 3,
-                (MENU_HEIGHT / 2) + 4, 0, 128, 0);
+                TOTAL_WIDTH - (4 * (TOTAL_WIDTH / 128)),
+                (MENU_HEIGHT / 2) - 9, 0, 128, 0);
   } else {
     display->DisplayText("N",
-                TOTAL_WIDTH - (7 * (TOTAL_WIDTH / 128)) - 3,
-                (MENU_HEIGHT / 2) + 4, 128, 0, 0);
+                TOTAL_WIDTH - (4 * (TOTAL_WIDTH / 128)),
+                (MENU_HEIGHT / 2) - 9, 128, 0, 0);
   }
   display->Render();
 }
