@@ -44,12 +44,6 @@ jobs:
       fail-fast: false
       matrix:
         panels:
-          - env: ZeDMD_PPUCDMD_128x32
-            file_name: 128x32
-          - env: ZeDMD_PPUCDMD_256x64_P2
-            file_name: 256x64_P2
-          - env: ZeDMD_PPUCDMD_256x64_P1875
-            file_name: 256x64_P1875
           - env: PPUCDMD_128x16
             file_name: 128x16
           - env: PPUCDMD_128x32
