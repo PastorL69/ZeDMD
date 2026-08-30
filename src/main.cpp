@@ -2389,8 +2389,10 @@ void loop1() {
       spiTransport->initDmdReader();
       lastDmdReaderInitAttempt = now;
       countDmdReaderSignals = false;
+
       dmdReaderRetryCount++;
-      if (dmdReaderRetryCount >= 5) {
+      if (dmdReaderRetryCount >= 25) {
+        // display a debug message after 25 seconds if signals qualify.
         DisplayPpucDmdDebug();
       }
     }
