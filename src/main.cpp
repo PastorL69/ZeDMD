@@ -179,6 +179,11 @@ static void DisplayPpucDmdDebug() {
   uint16_t rclk = detected_signals >> 16;  // never exceeds 25000
   uint16_t rdata = detected_signals;       // never exceeds 600
 
+  if (dotclk == 17180127 && rclk == 9695 && rdata == 9433) {
+    // These are the consistent values when the DMDreader pins are left floating
+    return;
+  }
+
   // loopback is enabled by default. if it is inactive -> Pi available.
   bool connectionEstablished = !transport->isLoopback();
 
