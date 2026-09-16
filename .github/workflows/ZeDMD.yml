@@ -48,7 +48,6 @@ jobs:
           'LilygoS3Amoled_128x32',
           'LilygoS3Amoled_128x32_wifi',
           'RP2040_128x32',
-          'RP2040_256x64',
           'RP2350_128x32',
           'RP2350_192x64',
           'RP2350_256x64',
