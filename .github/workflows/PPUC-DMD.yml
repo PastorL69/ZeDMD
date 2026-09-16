@@ -5,6 +5,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   version:
     name: Detect version
@@ -37,10 +41,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ version ]
     strategy:
+      fail-fast: false
       matrix:
-        panels: ['pico2_128x32_ppucdmd', 'pico2_256x64_ppucdmd', 'pico2_128x64x2_ppucdmd', 'ppucdmd_128x16', 'ppucdmd_128x32', 'ppucdmd_192x64', 'ppucdmd_256x64', 'ppucdmd_128x64x2']
+        panels:
+          - env: PPUCDMD_128x16
+            file_name: 128x16
+          - env: PPUCDMD_128x32
+            file_name: 128x32
+          - env: PPUCDMD_192x64
+            file_name: 192x64
+          - env: PPUCDMD_256x64_P2
+            file_name: 256x64_P2
+          - env: PPUCDMD_256x64_P1875
+            file_name: 256x64_P1875
 
-    name: ${{ matrix.panels }}
+    name: ${{ matrix.panels.env }}
 
     steps:
       - uses: actions/checkout@v6
@@ -63,29 +78,46 @@ jobs:
 
       - name: Build firmware
         run: |
-          pio run -e ${{ matrix.panels }}
-          pio run -e ${{ matrix.panels }} -t buildfs
-          pio run -e ${{ matrix.panels }} -t buildunified 2>&1 | tee build.log
-          BUILD_DIR=.pio/build/${{ matrix.panels }}
+          VERSION="v${{ needs.version.outputs.tag }}"
+          NAME="${{ matrix.panels.file_name }}"
+          
+          pio run -e ${{ matrix.panels.env }}
+          pio run -e ${{ matrix.panels.env }} -t buildfs
+          pio run -e ${{ matrix.panels.env }} -t buildunified 2>&1 | tee build.log
+          BUILD_DIR=.pio/build/${{ matrix.panels.env }}
 
-          OFFSET_BIN=$(( $(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1) - 0x10000000 ))
-          cp $BUILD_DIR/firmware.bin $BUILD_DIR/firmware_with_fs.bin
-          truncate -s $OFFSET_BIN $BUILD_DIR/firmware_with_fs.bin
-          cat $BUILD_DIR/littlefs.bin >> $BUILD_DIR/firmware_with_fs.bin
+          # Extract raw offset string (e.g., 0x101bf000)
+          FS_OFFSET=$(grep -oE -- '--offset 0x[0-9a-fA-F]+' build.log | grep -oE '0x[0-9a-fA-F]+' | tail -n 1)
 
-          cp $BUILD_DIR/firmware_with_fs.uf2 firmware.uf2
-          cp $BUILD_DIR/firmware.uf2 firmware-update.uf2
-          cp $BUILD_DIR/firmware_with_fs.bin firmware.bin
-          cp $BUILD_DIR/firmware.bin firmware-update.bin
+          # Merge code .bin (at 0x10000000) and LittleFS .bin (at $FS_OFFSET) into a single sparse HEX file
+          python3 -c "
+          from intelhex import IntelHex
+          ih = IntelHex()
+          ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
+          ih.loadbin('$BUILD_DIR/littlefs.bin', offset=int('$FS_OFFSET', 16))
+          ih.tofile('${NAME}_${VERSION}.hex', format='hex')
+          "
+
+          # Create unpadded update-only HEX file
+          python3 -c "
+          from intelhex import IntelHex
+          ih = IntelHex()
+          ih.loadbin('$BUILD_DIR/firmware.bin', offset=0x10000000)
+          ih.tofile('update_${NAME}_${VERSION}.hex', format='hex')
+          "
+
+          # Artifact copies
+          cp $BUILD_DIR/firmware_with_fs.uf2 "${NAME}_${VERSION}.uf2"
+          cp $BUILD_DIR/firmware.uf2 "update_${NAME}_${VERSION}.uf2"
 
       - uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.panels }}
+          name: ${{ matrix.panels.env }}
           path: |
-            firmware.uf2
-            firmware-update.uf2
-            firmware.bin
-            firmware-update.bin
+            ${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.uf2
+            update_${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.uf2
+            ${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.hex
+            update_${{ matrix.panels.file_name }}_v${{ needs.version.outputs.tag }}.hex
 
   post-build:
     runs-on: ubuntu-latest
@@ -96,42 +128,21 @@ jobs:
       - name: Package
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-            cd ../pico2_128x32_ppucdmd
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x32_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../pico2_256x64_ppucdmd
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_256x64_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../pico2_128x64x2_ppucdmd
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../pico2_128x64x2_ppucdmd.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_128x16
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x16.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_128x32
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x32.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_192x64
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_192x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_256x64
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_256x64.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ../ppucdmd_128x64x2
-            echo "${{ needs.version.outputs.tag }}" > version.txt
-            zip ../ppucdmd_128x64x2.zip firmware.uf2 firmware-update.uf2 firmware.bin firmware-update.bin version.txt
-            cd ..
+          VERSION="v${{ needs.version.outputs.tag }}"
+
+          for dir in */ ; do
+            panel="${dir%/}"
+            if [ -d "${panel}" ]; then
+              cd "${panel}"
+              echo "${{ needs.version.outputs.tag }}" > version.txt
+              zip "../${panel}_${VERSION}.zip" *
+              cd ..
+            fi
+          done
+
       - name: Release
         uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
-          files: |
-            pico2_128x32_ppucdmd.zip
-            pico2_256x64_ppucdmd.zip
-            pico2_128x64x2_ppucdmd.zip
-            ppucdmd_128x16.zip
-            ppucdmd_128x32.zip
-            ppucdmd_192x64.zip
-            ppucdmd_256x64.zip
-            ppucdmd_128x64x2.zip
+          files: "*.zip"

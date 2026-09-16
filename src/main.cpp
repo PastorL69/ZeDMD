@@ -292,7 +292,7 @@ void DisplayVersion(bool logo = false) {
 
 void DisplayLum(uint8_t r = 128, uint8_t g = 128, uint8_t b = 128) {
   display->DisplayText(" ", (TOTAL_WIDTH / 2) - 26 - 1,
-                       MENU_HEIGHT - 6 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, r, g, b);
+                       MENU_HEIGHT - 5 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, r, g, b);
   display->DisplayText("BRIGHTNESS:", (TOTAL_WIDTH / 2) - 26,
                        MENU_HEIGHT - 5 + MENU_Y_OFFSET - MENU_SETTING_OFFSET, r, g, b);
   DisplayNumber(brightness, 2, (TOTAL_WIDTH / 2) + 18,
@@ -667,7 +667,7 @@ void AcquireNextBuffer() {
 void CheckMenuButton() {
 #ifndef DISPLAY_RM67162_AMOLED
 
-#ifdef BACKWARD_BUTTON_PIN
+#if defined(BACKWARD_BUTTON_PIN) && defined(PICO_BUILD)
   if (!digitalRead(FORWARD_BUTTON_PIN) || 
       !digitalRead(BACKWARD_BUTTON_PIN)) {
 #else
