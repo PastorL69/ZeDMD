@@ -42,6 +42,7 @@ jobs:
           'WROOM-32_128x32',
           'WROOM-32_128x64',
           'S3-N16R8_128x32',
+          'S3-N16R8_192x64',
           'S3-N16R8_256x64',
           'S3-N16R8_128x64',
           'LilygoS3Amoled_128x32',
@@ -49,8 +50,10 @@ jobs:
           'RP2040_128x32',
           'RP2040_256x64',
           'RP2350_128x32',
+          'RP2350_192x64',
           'RP2350_256x64',
           'RP2350_128x32_PPUCDMD',
+          'RP2350_192x64_PPUCDMD',
           'RP2350_256x64_P2_PPUCDMD',
           'RP2350_256x64_P1875_PPUCDMD',
         ]
@@ -89,7 +92,7 @@ jobs:
             0x210000 .pio/build/${{ matrix.panels }}/littlefs.bin
           cp .pio/build/${{ matrix.panels }}/firmware.elf firmware.elf
 
-      - if: (matrix.panels == 'S3-N16R8_128x32' || matrix.panels == 'S3-N16R8_256x64' || matrix.panels == 'S3-N16R8_128x64' || matrix.panels == 'LilygoS3Amoled_128x32' || matrix.panels == 'LilygoS3Amoled_128x32_wifi')
+      - if: (matrix.panels == 'S3-N16R8_128x32' || matrix.panels == 'S3-N16R8_256x64' || matrix.panels == 'S3-N16R8_128x64' || matrix.panels == 'S3-N16R8_192x64' || matrix.panels == 'LilygoS3Amoled_128x32' || matrix.panels == 'LilygoS3Amoled_128x32_wifi')
         name: Build ZeDMD S3
         run: |
           pio run -e ${{ matrix.panels }}
