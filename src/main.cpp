@@ -2268,10 +2268,11 @@ void loop() {
               }
             } else {
               for (uint8_t y = 0; y < ZONE_HEIGHT; y++) {
-                memcpy(&renderBuffer[currentRenderBuffer]
-                                    [((yOffset + y) * TOTAL_WIDTH + xOffset)],
-                       &uncompressBuffer[uncompressedBufferPosition],
-                       3 * ZONE_WIDTH);
+                memcpy(
+                    &renderBuffer[currentRenderBuffer]
+                                 [((yOffset + y) * TOTAL_WIDTH + xOffset) * 3],
+                    &uncompressBuffer[uncompressedBufferPosition],
+                    3 * ZONE_WIDTH);
                 uncompressedBufferPosition += 3 * ZONE_WIDTH;
               }
             }
