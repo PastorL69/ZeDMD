@@ -1733,6 +1733,10 @@ void setup() {
         if (position == 5 || position == 3) position = forward ? 6 : 2;
 #endif
 
+#if defined(DMDREADER) && defined(RGB_ORDER_LOCK)
+        if (position == 7) position = forward ? 8 : 4;
+#endif
+
         switch (position) {
           case 1: {  // Exit
             RefreshSetupScreen();
