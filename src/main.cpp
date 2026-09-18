@@ -1733,6 +1733,10 @@ void setup() {
         if (position == 5 || position == 3) position = forward ? 6 : 2;
 #endif
 
+#if defined(DMDREADER) && defined(RGB_ORDER_LOCK)
+        if (position == 7) position = forward ? 8 : 4;
+#endif
+
         switch (position) {
           case 1: {  // Exit
             RefreshSetupScreen();
@@ -1939,12 +1943,12 @@ void setup() {
             break;
           }
           case 8: {  // LED Test
-            if (up && ++ledTest > 3)
+            if (up && ++ledTest > 4)
               ledTest = 0;
             else if (down &&
                      --ledTest >
-                         3)  // underflow will result in 255, set it to 2
-              ledTest = 3;
+                         4)  // underflow will result in 255, set it to 4
+              ledTest = 4;
             switch (ledTest) {
               case 0:
                 ClearScreen();
@@ -1969,6 +1973,10 @@ void setup() {
                 break;
               case 3:
                 display->FillScreen(0, 0, 255);
+                display->Render();
+                break;
+              case 4:
+                display->FillScreen(128, 128, 128);
                 display->Render();
                 break;
             }
