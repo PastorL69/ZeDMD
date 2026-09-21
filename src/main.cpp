@@ -1976,7 +1976,7 @@ void setup() {
                 display->Render();
                 break;
               case 4:
-                display->FillScreen(128, 128, 128);
+                display->FillScreen(255, 255, 255);
                 display->Render();
                 break;
             }
