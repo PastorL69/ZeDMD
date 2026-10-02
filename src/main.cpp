@@ -2097,6 +2097,7 @@ void loop() {
       if (TOTAL_WIDTH == 256 && TOTAL_HEIGHT == 64 &&
           dmdreader_get_source_width() * 2 == TOTAL_WIDTH &&
           dmdreader_get_source_height() * 2 == TOTAL_HEIGHT) {
+        Serial.printf("\nSCALE2X ENABLED");
         Scale2xLoopback(buffer, renderBuffer[currentRenderBuffer],
                         dmdreader_get_source_width(),
                         dmdreader_get_source_height());
