@@ -2090,6 +2090,10 @@ void loop() {
   } else if (transport->isLoopback()) {
     uint8_t *buffer = dmdreader_loopback_render();
     if (buffer != nullptr) {
+      Serial.printf("\nREAL WIDTH: ", TOTAL_WIDTH);
+      Serial.printf("\nREAL HEIGHT: ", TOTAL_HEIGHT);
+      Serial.printf("\nDMDREADER WIDTH: ", dmdreader_get_source_width());
+      Serial.printf("\nDMDREADER HEIGHT: ", dmdreader_get_source_height());
       if (TOTAL_WIDTH == 256 && TOTAL_HEIGHT == 64 &&
           dmdreader_get_source_width() * 2 == TOTAL_WIDTH &&
           dmdreader_get_source_height() * 2 == TOTAL_HEIGHT) {
