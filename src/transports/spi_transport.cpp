@@ -163,6 +163,7 @@ void SpiTransport::CheckFrameTimeout() {
   if (now - m_lastProgressUs > SPI_TRANSPORT_FRAME_TIMEOUT_US) {
     // The frame is incomplete, but the sender paused. Discard the data and
     // wait for the next frame.
+    digitalWrite(LED_BUILTIN, 1);
     Resync();
   }
 }
