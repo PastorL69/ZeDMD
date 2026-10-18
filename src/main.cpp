@@ -738,7 +738,7 @@ void Render(bool renderAll = true) {
       }
     }
     uint32_t stamp2 = micros();
-    Serial.printf("stamp: uS%d\n", stamp2-stamp1)
+    Serial.printf("stamp: uS%d\n", stamp2-stamp1);
 
     if (renderAll) display->Render();
     if (NUM_RENDER_BUFFERS > 1) {
