@@ -22,9 +22,8 @@ class PicoLedMatrix final : public LedMatrix {
   void FillPanelRaw(uint8_t *pBuffer) override;
   void Render() override;
 
-  // Full RGB565 frame (TOTAL_WIDTH x TOTAL_HEIGHT, little-endian): converted
-  // straight into the HUB75 draw buffer and shown at the next refresh
-  // boundary without copying.
+  // Full RGB565 frame (TOTAL_WIDTH x TOTAL_HEIGHT, little-endian), converted
+  // straight into the HUB75 draw buffer. Call Render() to publish it.
   void FillPanelRaw565(const uint8_t *pBuffer);
 
  private:

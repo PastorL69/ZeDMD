@@ -2079,6 +2079,7 @@ void setup() {
 // buffer. renderBuffer is bypassed and keeps its last content.
 void RenderSpiFrame(const uint8_t *src) {
   static_cast<PicoLedMatrix *>(display)->FillPanelRaw565(src);
+  display->Render();
 
 #ifdef ZEDMD_CLIENT_DEBUG_FPS
   FpsUpdate();

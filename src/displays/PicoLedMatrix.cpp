@@ -114,12 +114,7 @@ void IRAM_ATTR PicoLedMatrix::FillPanelRaw(uint8_t *pBuffer) {
 }
 
 void IRAM_ATTR PicoLedMatrix::FillPanelRaw565(const uint8_t *pBuffer) {
-  // With a yOffset the frame doesn't cover the panel, so keep the rest of it.
-  if (yOffset == 0 && TOTAL_HEIGHT == PANEL_HEIGHT) {
-    s_hub75->begin_frame();
-  }
   s_hub75->draw_rgb565(0, yOffset, TOTAL_WIDTH, TOTAL_HEIGHT, pBuffer);
-  s_hub75->flip();
 }
 
 void PicoLedMatrix::Render() { s_hub75->render(); }
