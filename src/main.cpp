@@ -1,7 +1,12 @@
 #ifdef PICO_BUILD
-// Set the 150 MHz system clock
+// Set the 266 MHz system clock
+// For RP2350/RP2040 custom clocks, PLL parameters must be provided
+#define PLL_SYS_VCO_FREQ_HZ 1596000000ul
+#define PLL_SYS_POSTDIV1 6
+#define PLL_SYS_POSTDIV2 1
+// officially, 200MHz clock is supported, but 266MHz should fine as well
 // @see SYS_CLK_MHZ https://github.com/raspberrypi/pico-sdk/releases/tag/2.1.1
-#define SYS_CLK_MHZ 150
+#define SYS_CLK_MHZ 266
 #endif
 
 #include <Arduino.h>
