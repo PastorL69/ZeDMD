@@ -16,6 +16,7 @@
 #define SPI_TRANSPORT_ENABLE_PIN 13
 #define SPI_TRANSPORT_CLK_PIN 18
 #define SPI_TRANSPORT_DATA_PIN 19
+#define SPI_TRANSPORT_FRAME_RECEIVED_PIN 16
 // A partially received frame that doesn't progress for this time in
 // microseconds gets discarded. Must be longer than any pause within a frame
 // and shorter than the pause between two frames.

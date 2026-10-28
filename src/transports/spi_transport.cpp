@@ -22,6 +22,8 @@ bool SpiTransport::init() {
   pinMode(SPI_TRANSPORT_ENABLE_PIN, INPUT_PULLDOWN);
   pinMode(SPI_TRANSPORT_CLK_PIN, INPUT);
   pinMode(SPI_TRANSPORT_DATA_PIN, INPUT);
+  pinMode(SPI_TRANSPORT_FRAME_RECEIVED_PIN, OUTPUT);
+  digitalWrite(SPI_TRANSPORT_FRAME_RECEIVED_PIN, LOW);
 
   dmdreader_error_blink(pio_claim_free_sm_and_add_program_for_gpio_range(
       &zedmd_spi_input_program, &m_pio, &m_stateMachine, &m_programOffset,
@@ -125,6 +127,10 @@ void SpiTransport::dmaHandler() {
 bool SpiTransport::GetFrameReceived() {
   if (m_frameReceived) {
     m_frameReceived = false;
+    // Signal the received frame to the host with a 1us pulse.
+    gpio_put(SPI_TRANSPORT_FRAME_RECEIVED_PIN, true);
+    busy_wait_us_32(1);
+    gpio_put(SPI_TRANSPORT_FRAME_RECEIVED_PIN, false);
     return true;
   }
 
